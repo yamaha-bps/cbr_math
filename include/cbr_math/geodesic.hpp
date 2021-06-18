@@ -23,7 +23,7 @@
 
 #define GEOGRAPHICLIB_GEODESIC_ORDER 6
 
-namespace cbr
+namespace cbr::geo
 {
 
 constexpr static int nA1_ = GEOGRAPHICLIB_GEODESIC_ORDER;
@@ -2099,6 +2099,6 @@ double GenInverse(
   return s12;
 }
 
-}  // namespace cbr
+}  // namespace cbr::geo
 
 #endif  // CBR_MATH__GEODESIC_HPP_

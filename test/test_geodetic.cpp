@@ -39,28 +39,28 @@ TEST(Geodetic, geographic2geocentric)
   Eigen::Vector3d lla(0., 0., 0.);
   Eigen::Vector3d llr;
 
-  cbr::geographic2geocentric(lla, llr);
+  cbr::geo::geographic2geocentric(lla, llr);
   EXPECT_DOUBLE_EQ(llr[0], 0.);
   EXPECT_DOUBLE_EQ(llr[1], 0.);
-  EXPECT_DOUBLE_EQ(llr[2], cbr::WGS84::a);
+  EXPECT_DOUBLE_EQ(llr[2], cbr::geo::WGS84::a);
 
   lla[0] = M_PI_2;
-  cbr::geographic2geocentric(lla, llr);
+  cbr::geo::geographic2geocentric(lla, llr);
   EXPECT_DOUBLE_EQ(llr[0], M_PI_2);
   EXPECT_DOUBLE_EQ(llr[1], 0.);
-  EXPECT_DOUBLE_EQ(llr[2], cbr::WGS84::b);
+  EXPECT_DOUBLE_EQ(llr[2], cbr::geo::WGS84::b);
 
   lla[0] = M_PI_4;
-  cbr::geographic2geocentric(lla, llr);
+  cbr::geo::geographic2geocentric(lla, llr);
   EXPECT_LT(llr[0], M_PI_4);
   EXPECT_DOUBLE_EQ(llr[1], 0.);
-  EXPECT_LT(llr[2], cbr::WGS84::a);
-  EXPECT_GT(llr[2], cbr::WGS84::b);
+  EXPECT_LT(llr[2], cbr::geo::WGS84::a);
+  EXPECT_GT(llr[2], cbr::geo::WGS84::b);
 
   for (double longi = 0.; longi < 2. * M_PI; longi += 0.1) {
     Eigen::Vector3d llr2;
     lla[1] = longi;
-    cbr::geographic2geocentric(lla, llr2);
+    cbr::geo::geographic2geocentric(lla, llr2);
     EXPECT_DOUBLE_EQ(llr2[0], llr[0]);
     EXPECT_DOUBLE_EQ(llr2[1], longi);
     EXPECT_DOUBLE_EQ(llr2[2], llr[2]);
@@ -68,10 +68,10 @@ TEST(Geodetic, geographic2geocentric)
 
   for (const auto & a : llas) {
     Eigen::Vector3d r1;
-    cbr::geographic2geocentric(a, r1);
-    auto r2 = cbr::geographic2geocentric(a);
+    cbr::geo::geographic2geocentric(a, r1);
+    auto r2 = cbr::geo::geographic2geocentric(a);
     Eigen::Vector3d r3 = a;
-    cbr::geographic2geocentric(r3, r3);
+    cbr::geo::geographic2geocentric(r3, r3);
 
     EXPECT_DOUBLE_EQ(r1[0], r2[0]);
     EXPECT_DOUBLE_EQ(r1[1], r2[1]);
@@ -87,10 +87,10 @@ TEST(Geodetic, llr2ecef)
 {
   for (const auto & lla : llas) {
     Eigen::Vector3d ecef, ecef2, llr, llr2;
-    cbr::lla2ecef(lla, ecef);
-    cbr::geographic2geocentric(lla, llr);
-    cbr::ecef2llr(ecef, llr2);
-    cbr::llr2ecef(llr2, ecef2);
+    cbr::geo::lla2ecef(lla, ecef);
+    cbr::geo::geographic2geocentric(lla, llr);
+    cbr::geo::ecef2llr(ecef, llr2);
+    cbr::geo::llr2ecef(llr2, ecef2);
 
     EXPECT_NEAR(llr[0], llr2[0], 1e-8);
     EXPECT_NEAR(llr[1], llr2[1], 1e-8);
@@ -101,10 +101,10 @@ TEST(Geodetic, llr2ecef)
     EXPECT_NEAR(ecef[2], ecef2[2], 1e-8);
   }
   for (const auto & lla : llas) {
-    const Eigen::Vector3d ecef = cbr::lla2ecef(lla);
-    const Eigen::Vector3d llr = cbr::geographic2geocentric(lla);
-    const Eigen::Vector3d llr2 = cbr::ecef2llr(ecef);
-    const Eigen::Vector3d ecef2 = cbr::llr2ecef(llr2);
+    const Eigen::Vector3d ecef = cbr::geo::lla2ecef(lla);
+    const Eigen::Vector3d llr = cbr::geo::geographic2geocentric(lla);
+    const Eigen::Vector3d llr2 = cbr::geo::ecef2llr(ecef);
+    const Eigen::Vector3d ecef2 = cbr::geo::llr2ecef(llr2);
 
     EXPECT_NEAR(llr[0], llr2[0], 1e-8);
     EXPECT_NEAR(llr[1], llr2[1], 1e-8);
@@ -120,16 +120,16 @@ TEST(Geodetic, lla2ecef)
 {
   for (const auto & lla : llas) {
     Eigen::Vector3d ecef, lla2;
-    cbr::lla2ecef(lla, ecef);
-    cbr::ecef2lla(ecef, lla2);
+    cbr::geo::lla2ecef(lla, ecef);
+    cbr::geo::ecef2lla(ecef, lla2);
 
     EXPECT_NEAR(lla[0], lla2[0], 1e-8);
     EXPECT_NEAR(lla[1], lla2[1], 1e-8);
     EXPECT_NEAR(lla[2], lla2[2], 1e-8);
   }
   for (const auto & lla : llas) {
-    const Eigen::Vector3d ecef = cbr::lla2ecef(lla);
-    const Eigen::Vector3d lla2 = cbr::ecef2lla(ecef);
+    const Eigen::Vector3d ecef = cbr::geo::lla2ecef(lla);
+    const Eigen::Vector3d lla2 = cbr::geo::ecef2lla(ecef);
 
     EXPECT_NEAR(lla[0], lla2[0], 1e-8);
     EXPECT_NEAR(lla[1], lla2[1], 1e-8);
@@ -161,22 +161,22 @@ TEST(Geodetic, geo2ecef)
   {
     Eigen::Quaterniond qIn = Eigen::Quaterniond::Identity();
     Eigen::Quaterniond qOut;
-    cbr::geo2ecef(qIn, ll, qOut);
+    cbr::geo::geo2ecef(qIn, ll, qOut);
     test(qOut);
   }
   {
     Eigen::Quaterniond qIn = Eigen::Quaterniond::Identity();
-    Eigen::Quaterniond qOut = cbr::geo2ecef(qIn, ll);
+    Eigen::Quaterniond qOut = cbr::geo::geo2ecef(qIn, ll);
     test(qOut);
   }
   {
     Sophus::SO3d so3In, so3Out;
-    cbr::geo2ecef(so3In, ll, so3Out);
+    cbr::geo::geo2ecef(so3In, ll, so3Out);
     test(so3Out.unit_quaternion());
   }
   {
     Sophus::SO3d so3In;
-    Sophus::SO3d so3Out = cbr::geo2ecef(so3In, ll);
+    Sophus::SO3d so3Out = cbr::geo::geo2ecef(so3In, ll);
     test(so3Out.unit_quaternion());
   }
 }
@@ -248,41 +248,41 @@ TEST(Geodetic, imu2nwu)
         {
           Eigen::Quaterniond qIn = Eigen::Quaterniond::Identity();
           Eigen::Quaterniond qOut, qIn2;
-          cbr::imu2nwu(qIn, lla, qOut);
+          cbr::geo::imu2nwu(qIn, lla, qOut);
           test.second(qOut);
-          cbr::nwu2imu(qOut, lla, qIn2);
+          cbr::geo::nwu2imu(qOut, lla, qIn2);
           EXPECT_TRUE(qIn2.isApprox(qIn, 1e-12));
         }
         {
           Eigen::Quaterniond qIn = Eigen::Quaterniond::Identity();
-          Eigen::Quaterniond qOut = cbr::imu2nwu(qIn, lla);
-          Eigen::Quaterniond qIn2 = cbr::nwu2imu(qOut, lla);
+          Eigen::Quaterniond qOut = cbr::geo::imu2nwu(qIn, lla);
+          Eigen::Quaterniond qIn2 = cbr::geo::nwu2imu(qOut, lla);
           test.second(qOut);
           EXPECT_TRUE(qIn2.isApprox(qIn, 1e-12));
         }
         {
           Sophus::SO3d so3In, so3Out, so3In2;
-          cbr::imu2nwu(so3In, lla, so3Out);
-          cbr::nwu2imu(so3Out, lla, so3In2);
+          cbr::geo::imu2nwu(so3In, lla, so3Out);
+          cbr::geo::nwu2imu(so3Out, lla, so3In2);
           test.second(so3Out.unit_quaternion());
           EXPECT_TRUE(so3In2.unit_quaternion().isApprox(so3In.unit_quaternion(), 1e-12));
         }
         {
           Sophus::SO3d so3In;
-          Sophus::SO3d so3Out = cbr::imu2nwu(so3In, lla);
-          Sophus::SO3d so3In2 = cbr::nwu2imu(so3Out, lla);
+          Sophus::SO3d so3Out = cbr::geo::imu2nwu(so3In, lla);
+          Sophus::SO3d so3In2 = cbr::geo::nwu2imu(so3Out, lla);
           test.second(so3Out.unit_quaternion());
           EXPECT_TRUE(so3In2.unit_quaternion().isApprox(so3In.unit_quaternion(), 1e-12));
         }
         {
           Sophus::SE3d se3In, se3Out;
-          cbr::imu2nwu(se3In, se3Out);
+          cbr::geo::imu2nwu(se3In, se3Out);
           test.second(se3Out.so3().unit_quaternion());
         }
         {
           Sophus::SE3d se3In;
-          Sophus::SE3d se3Out = cbr::imu2nwu(se3In);
-          Sophus::SE3d se3In2 = cbr::nwu2imu(se3Out);
+          Sophus::SE3d se3Out = cbr::geo::imu2nwu(se3In);
+          Sophus::SE3d se3In2 = cbr::geo::nwu2imu(se3Out);
           test.second(se3Out.so3().unit_quaternion());
           EXPECT_EQ(se3In.translation().x(), se3Out.translation().x());
           EXPECT_EQ(se3In.translation().y(), se3Out.translation().y());
@@ -299,8 +299,8 @@ TEST(Geodetic, lla2gnomonic)
 {
   constexpr double eps = 1e-12;
 
-  using cbr::lla2gnomonic;
-  using cbr::gnomonic2lla;
+  using cbr::geo::lla2gnomonic;
+  using cbr::geo::gnomonic2lla;
 
   Eigen::Vector3d llaRef{0., 0., 0.};
   Eigen::Vector3d lla{0., M_PI, 0.};
@@ -373,8 +373,8 @@ TEST(Geodetic, lla2nwu)
       // const auto & q = qs[i];
       Eigen::Vector3d nwu, lla2;
 
-      cbr::lla2nwu(lla, llaRef, nwu);
-      cbr::nwu2lla(nwu, llaRef, lla2);
+      cbr::geo::lla2nwu(lla, llaRef, nwu);
+      cbr::geo::nwu2lla(nwu, llaRef, lla2);
 
       EXPECT_NEAR(lla[0], lla2[0], 1e-8);
       EXPECT_NEAR(lla[1], lla2[1], 1e-8);
@@ -399,7 +399,7 @@ TEST(Geodetic, lla2nwu_flip)
   // express one point in the frame of the other
   // - position should be [0, 0, -2*r]
   // - orientation amounts to a π-rotation around the x axis
-  cbr::lla2nwu(
+  cbr::geo::lla2nwu(
     lla, quat,
     llaFrame, quatFrame,
     xyzInFrame, quatInFrame
@@ -407,7 +407,7 @@ TEST(Geodetic, lla2nwu_flip)
 
   EXPECT_NEAR(xyzInFrame.x(), 0, 1e-8);
   EXPECT_NEAR(xyzInFrame.y(), 0, 1e-8);
-  EXPECT_NEAR(xyzInFrame.z(), -2 * cbr::WGS84::a, 1e-8);
+  EXPECT_NEAR(xyzInFrame.z(), -2 * cbr::geo::WGS84::a, 1e-8);
 
   EXPECT_NEAR(quatInFrame.w(), 0, 1e-8);
   EXPECT_NEAR(std::abs(quatInFrame.x()), 1, 1e-8);
@@ -423,12 +423,12 @@ TEST(Geodetic, nwu2lla_rot)
   Eigen::Quaterniond quatFrame = Eigen::Quaterniond::Identity();
 
   // translate 45 degrees
-  Eigen::Vector3d xyzInFrame{0, cbr::WGS84::a, -cbr::WGS84::a};
+  Eigen::Vector3d xyzInFrame{0, cbr::geo::WGS84::a, -cbr::geo::WGS84::a};
   Eigen::Quaterniond quatInFrame = Eigen::Quaterniond::Identity();
 
   Eigen::Vector3d lla;
   Eigen::Quaterniond quat;
-  cbr::nwu2lla(xyzInFrame, quatInFrame, llaFrame, quatFrame, lla, quat);
+  cbr::geo::nwu2lla(xyzInFrame, quatInFrame, llaFrame, quatFrame, lla, quat);
 
   // resulting lla should be rotated 90 deg
   // orientation should be rotated 90 deg around x axis

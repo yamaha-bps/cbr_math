@@ -5,7 +5,7 @@
 #ifndef CBR_MATH__GEODETIC_DATA_HPP_
 #define CBR_MATH__GEODETIC_DATA_HPP_
 
-namespace cbr
+namespace cbr::geo
 {
 
 /***************************************************************************

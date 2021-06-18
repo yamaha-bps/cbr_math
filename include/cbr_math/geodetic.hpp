@@ -17,7 +17,7 @@
 #include "math.hpp"
 // #include "geodesic.hpp"
 
-namespace cbr
+namespace cbr::geo
 {
 
 /***************************************************************************

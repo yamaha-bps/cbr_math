@@ -1,4 +1,7 @@
-// Copyright 2020 Yamaha Motor Corporation, USA
+// Copyright Yamaha 2021
+// MIT License
+// https://github.com/yamaha-bps/cbr_math/blob/master/LICENSE
+
 #ifndef CBR_MATH__INTERP__PIECEWISE_LINEAR_HPP_
 #define CBR_MATH__INTERP__PIECEWISE_LINEAR_HPP_
 

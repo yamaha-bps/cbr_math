@@ -97,8 +97,6 @@ add_custom_target(uninstall
 # ---------------------------------------------------------------------------------------
 
 if(BUILD_TESTING)
-  enable_testing()
-
   find_package(GTest REQUIRED)
 
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)

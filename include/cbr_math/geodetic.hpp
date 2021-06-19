@@ -15,7 +15,6 @@
 
 #include "geodetic_data.hpp"
 #include "math.hpp"
-// #include "geodesic.hpp"
 
 namespace cbr::geo
 {
@@ -934,15 +933,12 @@ double distGeodesicVincenty(
 template<typename _ref = WGS84>
 double distGreatCircle(
   const Eigen::Ref<const Eigen::Vector2d> pt1,
-  const Eigen::Ref<const Eigen::Vector2d> pt2,
-  const double tol = 1e-10,
-  const uint64_t maxIter = 1000)
+  const Eigen::Ref<const Eigen::Vector2d> pt2)
 {
   const auto & lat1 = pt1[0];
   const auto & lat2 = pt2[0];
   const auto & lon1 = pt1[1];
   const auto & lon2 = pt2[1];
-  const auto latMean = (lat1 + lat2) / 2.;
 
   const double dLat = (lat2 - lat1);
   const double dLon = (lon2 - lon1);

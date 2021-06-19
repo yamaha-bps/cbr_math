@@ -8,7 +8,7 @@
 #include <sophus/se3.hpp>
 
 #include "cbr_math/lie/common.hpp"
-#include "cbr_math/lie/En.hpp"
+#include "cbr_math/lie/Tn.hpp"
 #include "cbr_math/lie/group_product.hpp"
 
 
@@ -25,7 +25,7 @@ TEST(Lie, Common)
     std::is_same_v<Sophus::SE3f,
     cbr::lie::detail::change_scalar_t<Sophus::SE3d, float>>);
   static_assert(
-    std::is_same_v<cbr::lie::E5f, cbr::lie::detail::change_scalar_t<cbr::lie::E5d,
+    std::is_same_v<cbr::lie::T5f, cbr::lie::detail::change_scalar_t<cbr::lie::T5d,
     float>>);
   static_assert(
     std::is_same_v<Eigen::Vector4f, cbr::lie::detail::change_scalar_t<Eigen::Vector4d,
@@ -52,7 +52,7 @@ TEST(Lie, dl_expinv_approx)
     G::lieBracket(u, v) / 2 + G::lieBracket(u, G::lieBracket(u, v)) / 12;
   ASSERT_LE((dexpinv2 - dexpinv2_ans).norm(), 1e-10);
 
-  using G2 = cbr::lie::GroupProduct<double, 0, cbr::lie::E3>;
+  using G2 = cbr::lie::GroupProduct<double, 0, cbr::lie::T3>;
 
   Eigen::Vector3d dexpinv3 = cbr::lie::dl_expinv_approx<G2>(u, v, 3);
   ASSERT_LE((dexpinv3 - v).norm(), 1e-10);
@@ -61,7 +61,7 @@ TEST(Lie, dl_expinv_approx)
 
 TEST(Lie, En)
 {
-  using state_t = cbr::lie::En<double, 7>;
+  using state_t = cbr::lie::Tn<double, 7>;
   Eigen::Matrix<double, 7, 1> mat;
   mat << 1, 2, 3, 4, 5, 6, 7;
   mat /= 10;
@@ -74,7 +74,7 @@ TEST(Lie, En)
   static_assert(
     std::is_same_v<
       std::remove_reference_t<decltype(cast)>,
-      cbr::lie::En<float, 7>
+      cbr::lie::Tn<float, 7>
     >
   );
   ASSERT_LE((cast.translation() - mat.cast<float>()).norm(), 1e-10);
@@ -105,7 +105,7 @@ TEST(Lie, En)
 
 TEST(Lie, EnMap)
 {
-  using state_t = cbr::lie::E4d;
+  using state_t = cbr::lie::T4d;
 
   double * data = new double[4];
   const double * const_data = data;
@@ -159,7 +159,7 @@ TEST(Lie, EnMap)
 
 TEST(Lie, GroupProduct)
 {
-  using state_t = cbr::lie::GroupProduct<double, 0, Sophus::SE3, cbr::lie::E4, Sophus::SO3>;
+  using state_t = cbr::lie::GroupProduct<double, 0, Sophus::SE3, cbr::lie::T4, Sophus::SO3>;
 
   std::default_random_engine rng(10);
 
@@ -243,7 +243,7 @@ TEST(Lie, GroupProduct)
 
 TEST(Lie, GroupProductMapEn)
 {
-  using state_t = cbr::lie::GroupProduct<double, 0, cbr::lie::E3>;
+  using state_t = cbr::lie::GroupProduct<double, 0, cbr::lie::T3>;
 
   double * data1 = new double[state_t::num_parameters];
   double * data2 = new double[state_t::num_parameters];
@@ -266,7 +266,7 @@ TEST(Lie, GroupProductMapEn)
 
 TEST(Lie, GroupProductMap)
 {
-  using state_t = cbr::lie::GroupProduct<double, 0, Sophus::SE3, Sophus::SO3, cbr::lie::E3>;
+  using state_t = cbr::lie::GroupProduct<double, 0, Sophus::SE3, Sophus::SO3, cbr::lie::T3>;
 
   double * data = new double[state_t::num_parameters];
 
@@ -340,9 +340,9 @@ void run_dr_expinv_test()
 
 TEST(Lie, dexpinv_closed)
 {
-  run_dr_expinv_test<cbr::lie::E4d>();
+  run_dr_expinv_test<cbr::lie::T4d>();
   run_dr_expinv_test<Sophus::SE2d>();
   run_dr_expinv_test<Sophus::SO3d>();
   run_dr_expinv_test<Sophus::SE3d>();
-  run_dr_expinv_test<cbr::lie::GroupProduct<double, 0, Sophus::SO3, cbr::lie::E3>>();
+  run_dr_expinv_test<cbr::lie::GroupProduct<double, 0, Sophus::SO3, cbr::lie::T3>>();
 }

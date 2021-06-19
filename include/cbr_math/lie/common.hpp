@@ -16,7 +16,7 @@
 
 #include <limits>
 
-#include "En.hpp"
+#include "Tn.hpp"
 #include "group_product.hpp"
 
 
@@ -30,10 +30,10 @@ struct dexp_trait
 {};
 
 /**
- * @brief Calculate dr_expinv_x for E(n)
+ * @brief Calculate dr_expinv_x for T(n)
  */
 template<typename Scalar, int Dim>
-struct dexp_trait<En<Scalar, Dim>>
+struct dexp_trait<Tn<Scalar, Dim>>
 {
   using Jacobian = Eigen::Matrix<Scalar, Dim, Dim>;
 

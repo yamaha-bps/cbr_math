@@ -11,7 +11,7 @@
 #include <limits>
 #include <vector>
 
-#include "cbr_math/lie/En.hpp"
+#include "cbr_math/lie/Tn.hpp"
 #include "cbr_math/lie/bspline.hpp"
 
 using cbr::lie::bspline::coeffMatrix, cbr::lie::bspline::coeffMatrixCard;
@@ -132,7 +132,7 @@ TEST(BSpline, CoeffMatrix3)
 
 TEST(BSpline, eval)
 {
-  using R1 = cbr::lie::En<double, 1, 0>;
+  using R1 = cbr::lie::Tn<double, 1, 0>;
 
   for (int i = 0; i != 2; ++i) {  // card and non-card
     bool card = static_cast<bool>(i);
@@ -175,7 +175,7 @@ TEST(BSpline, eval)
 
 TEST(BSpline, R2)
 {
-  using R2 = cbr::lie::En<double, 2, 0>;
+  using R2 = cbr::lie::Tn<double, 2, 0>;
 
   row_t breakPts = (row_t(4) << 1, 2, 4, 5).finished();
   std::vector<R2, Eigen::aligned_allocator<R2>> vals{R2{1, 3}, R2{2, 3}, R2{2, 4}, R2{3, 4}};

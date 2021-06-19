@@ -7,9 +7,6 @@
 
 #include <Eigen/Dense>
 
-#include <sophus/se2.hpp>
-#include <sophus/se3.hpp>
-
 #include <utility>
 #include <vector>
 #include <array>
@@ -126,12 +123,6 @@ public:
     static_assert(is_eigen_dense_v<T1>, "x must be an Eigen::DenseBase object.");
 
     using Group = typename std::decay_t<T2>::value_type;
-    static_assert(
-      std::is_base_of_v<Sophus::SO2Base<Group>, Group>||
-      std::is_base_of_v<Sophus::SE2Base<Group>, Group>||
-      std::is_base_of_v<Sophus::SO3Base<Group>, Group>||
-      std::is_base_of_v<Sophus::SE3Base<Group>, Group>,
-      "Group must be one of Sophus' SO2, SO3, SE2 or SE3.");
 
     using GroupScalar = typename Group::Scalar;
     constexpr static int Dimension = Group::DoF;

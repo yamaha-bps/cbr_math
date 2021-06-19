@@ -8,9 +8,6 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
-#include <autodiff/forward.hpp>
-#include <autodiff/forward/eigen.hpp>
-
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -810,64 +807,6 @@ auto sqrt_information(const Eigen::MatrixBase<Derived> & cov, typename Derived::
   return (es.eigenvectors() *
          es.eigenvalues().cwiseMax(min_eig).cwiseSqrt().cwiseInverse().asDiagonal() *
          es.eigenvectors().transpose()).eval();
-}
-
-/**
- * @brief Calculate variable x square root information for the MLE of a quadratic form
- *
- *   min_x  \sum_i  \| fcn(x, data_i) \|^2
- *
- * The calculated quantity is
- *
- *   sqrt( \sum_i  Ji^T * I_r * Ji )
- *
- * where Ji = (d/dx) fcn(x, data_i)
- *       sqrtI_r = Cov_r^{-1/2} is the residual square root information matrx
- *
- * @tparam DataContainerT a container with data
- * @tparam ErrorFcnT function that evaluates the residual for a piece of data
- * @param x optimal value for variable (Eigen matrix of size nx x 1)
- * @param data collection of data
- * @param fcn function that calculates residual from variable and data (must support AD scalar)
- * @return nx by nx matrix
- */
-template<typename Derived, typename DataContainerT, typename ErrorFcnT>
-auto variable_sqrt_information(
-  const Eigen::MatrixBase<Derived> & x,
-  const DataContainerT & data,
-  ErrorFcnT && fcn
-)
-{
-  static_assert(Derived::ColsAtCompileTime == 1, "x must be a column vector");
-  using Scalar = typename Derived::Scalar;
-
-  using ResT = typename std::result_of_t<
-    ErrorFcnT(typename Derived::PlainMatrix, typename DataContainerT::value_type)
-    >::PlainMatrix;
-  static_assert(ResT::ColsAtCompileTime == 1, "fcn must map to column vector");
-  static_assert(std::is_base_of_v<Eigen::MatrixBase<ResT>, ResT>, "fcn must map to eigen type");
-
-  static constexpr int nx = Derived::RowsAtCompileTime;
-  static constexpr int nr = ResT::RowsAtCompileTime;
-
-  Eigen::Matrix<Scalar, nx, nx> I_x;
-  I_x.setZero();
-
-  auto x_ad = x.template cast<autodiff::forward::dual>().eval();
-  Eigen::Matrix<autodiff::forward::dual, nr, 1> res_ad;
-
-  for (std::size_t i = 0; i != data.size(); ++i) {
-    auto Ji = autodiff::forward::jacobian(
-      [i, &data, &fcn](const auto & var) {return fcn(var, data[i]);},
-      autodiff::forward::wrt(x_ad), autodiff::forward::at(x_ad), res_ad
-    );
-    I_x += Ji.transpose() * Ji;
-  }
-
-  // return square root information matrix
-  Eigen::Matrix<Scalar, nx, nx> sqrtI_x =
-    Eigen::SelfAdjointEigenSolver<Eigen::Matrix<Scalar, nx, nx>>(I_x).operatorSqrt();
-  return sqrtI_x;
 }
 
 }  // namespace cbr

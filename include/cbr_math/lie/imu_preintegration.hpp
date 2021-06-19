@@ -12,7 +12,7 @@
 #include <utility>
 #include <vector>
 
-#include "En.hpp"
+#include "Tn.hpp"
 #include "group_product.hpp"
 
 namespace bps::preint
@@ -21,7 +21,7 @@ template<typename T>
 using State = cbr::lie::GroupProduct<
   T, 0,
   Sophus::SE3,  // pose
-  cbr::lie::E3  // linear velocity (vx, vy, vz)
+  cbr::lie::T3  // linear velocity (vx, vy, vz)
 >;
 
 static constexpr std::size_t poseIdx = 0;
@@ -41,7 +41,7 @@ template<typename T>
 using Position = Sophus::Vector3<T>;
 
 template<typename T>
-using Velocity = cbr::lie::E3<T>;
+using Velocity = cbr::lie::T3<T>;
 
 template<typename T>
 using Covariance = Eigen::Matrix<T, DoF, DoF>;

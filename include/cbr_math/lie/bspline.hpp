@@ -199,7 +199,7 @@ public:
 
   /**
    * Evaluate spline at a point
-   * @tparam S type to use (e.g. double or autodiff::dual)
+   * @tparam S type to use (e.g. double or autodiff type)
    * @param t parameter value to evaluate
    */
   template<typename S = typename T::Scalar>
@@ -221,7 +221,7 @@ public:
    * Returns \omega \in TM s.t. \dot X = X \hat \omega where X is
    * the matrix representation of the Lie group element X
    *
-   * @tparam S type to use (e.g. double or autodiff::dual)
+   * @tparam S type to use (e.g. double or autodiff type)
    */
   template<typename S = typename T::Scalar>
   typename detail::change_scalar_t<typename T::Tangent, S> der(const S & t) const
@@ -246,7 +246,7 @@ public:
    * Returns \omega \in TM s.t. \ddot X = X (\hat \omega)^2 + X \hat \dot \omega
    * where X is the matrix representation of the Lie group element X
    *
-   * @tparam S type to use (e.g. double or autodiff::dual)
+   * @tparam S type to use (e.g. double or autodiff type)
    */
   template<typename S = typename T::Scalar>
   typename detail::change_scalar_t<typename T::Tangent, S> der2(const S & t) const

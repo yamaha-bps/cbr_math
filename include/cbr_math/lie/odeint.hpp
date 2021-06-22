@@ -1,4 +1,6 @@
-// Copyright 2020 Yamaha Motor Corporation, USA
+// Copyright Yamaha 2021
+// MIT License
+// https://github.com/yamaha-bps/cbr_math/blob/master/LICENSE
 
 /*
 Integration methods on Lie Groups
@@ -19,11 +21,11 @@ TODOs
 */
 
 
-#ifndef BPS_LIBRARY__LIE__ODEINT_HPP_
-#define BPS_LIBRARY__LIE__ODEINT_HPP_
+#ifndef CBR_MATH__LIE__ODEINT_HPP_
+#define CBR_MATH__LIE__ODEINT_HPP_
 
 #include <boost/numeric/odeint/stepper/stepper_categories.hpp>
-#include <bps_library/utils.hpp>
+#include <cbr_utils/utils.hpp>
 
 #include <limits>
 #include <tuple>
@@ -34,7 +36,7 @@ TODOs
 
 using std::get, std::numeric_limits;
 
-namespace bps::lie::odeint
+namespace cbr::lie::odeint
 {
 
 /**
@@ -95,11 +97,11 @@ public:
     using R_t = std::decay_t<decltype(Tableau<Value>::R)>;
 
     // calculate ki's by iterating through butcher tableau
-    bps::static_for<R_t, Tableau<Value>::R>(
+    cbr::static_for<R_t, Tableau<Value>::R>(
       [&](auto s) {
         // calculate u[s] = \sum_j a[s][j] * dexpinv(u[j], k[j])
         u[s] = deriv_type::Zero();
-        bps::static_for<R_t, s.value>(
+        cbr::static_for<R_t, s.value>(
           [&](auto j) {
             if (Tableau<Value>::A[s - 1][j] != 0) {
               u[s] += Tableau<Value>::A[s - 1][j] *
@@ -113,7 +115,7 @@ public:
 
     // calculate step
     deriv_type ufin = deriv_type::Zero();
-    bps::static_for_index<Tableau<Value>::R>(
+    cbr::static_for_index<Tableau<Value>::R>(
       [&](auto j) {
         ufin += Tableau<Value>::B[j] * k[j];
       });
@@ -171,6 +173,6 @@ struct cash_karp_tableau
     V(7) / V(8)};
 };
 
-}  // namespace bps::lie::odeint
+}  // namespace cbr::lie::odeint
 
-#endif  // BPS_LIBRARY__LIE__ODEINT_HPP_
+#endif  // CBR_MATH__LIE__ODEINT_HPP_

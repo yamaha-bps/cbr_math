@@ -1,0 +1,95 @@
+name: build_and_test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch: ~
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+        build_type: [Release, Debug]
+        compiler:
+          [{ "cc": "gcc", "cxx": "g++" }, { "cc": "clang", "cxx": "clang++" }]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+          libgtest-dev \
+          libeigen3-dev
+
+      - name: Configure CMake
+        run: |
+          cmake -B ${{ github.workspace }}/build \
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+          -DCMAKE_C_COMPILER=${{ matrix.compiler.cc }} \
+          -DCMAKE_CXX_COMPILER=${{ matrix.compiler.cxx }} \
+          -DBUILD_TESTING=ON
+
+      - name: Build
+        working-directory: ${{ github.workspace }}/build
+        run: make -j2
+
+      - name: Test
+        working-directory: ${{ github.workspace }}/build
+        run: make test
+
+  testcov:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+          lcov \
+          libgtest-dev \
+          libeigen3-dev
+          mkdir ${{ github.workspace }}/tools
+
+      - name: Checkout Sophus
+        uses: actions/checkout@v2
+        with:
+          repository: strasdat/Sophus
+          path: "tools/Sophus"
+      - name: Build and Install Sophus
+        run: |
+          mkdir ${{ github.workspace }}/tools/Sophus/build
+          cd ${{ github.workspace }}/tools/Sophus/build
+          cmake ..
+          make -j2
+          sudo make install
+
+      - name: Configure CMake
+        run: |
+          cmake -B ${{ github.workspace }}/build \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DBUILD_TESTING=ON \
+          -DCMAKE_CXX_FLAGS="-O0 -g --coverage -fno-inline" \
+          -DCMAKE_EXE_LINKER_FLAGS="--coverage"
+
+      - name: Build
+        working-directory: ${{ github.workspace }}/build
+        run: make -j2
+
+      - name: Test
+        working-directory: ${{ github.workspace }}/build
+        run: make test
+
+      - name: Analyze coverage
+        working-directory: ${{ github.workspace }}
+        run: |
+          lcov -c --no-external --directory include -d build/CMakeFiles -o lcov.info
+          genhtml lcov.info -o out

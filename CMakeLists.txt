@@ -9,6 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Eigen3 3.3 REQUIRED)
 find_package(Sophus REQUIRED)
+find_package(Boost REQUIRED)
 
 # ---------------------------------------------------------------------------------------
 # TARGETS

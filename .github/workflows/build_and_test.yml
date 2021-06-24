@@ -57,6 +57,7 @@ jobs:
           lcov \
           libgtest-dev \
           libeigen3-dev
+          mkdir ${{ github.workspace }}/tools
 
       - name: Checkout Sophus
         uses: actions/checkout@v2

@@ -389,7 +389,7 @@ TEST(Math, smoothSat)
   cbr::smoothSatInPlace(x, 2., 2.);
   ASSERT_DOUBLE_EQ(x, 2.);
 
-  constexpr auto xSat = cbr::smoothSat(0., -1., 1.);
+  auto xSat = cbr::smoothSat(0., -1., 1.);
   ASSERT_DOUBLE_EQ(xSat, 0.0);
 
   ASSERT_ANY_THROW(cbr::smoothSatInPlace(x, 1., -1.));
@@ -676,4 +676,3 @@ TEST(SampleCovariance, StDev)
     ASSERT_LE((calc - ans).norm(), 1e-9);
   }
 }
-

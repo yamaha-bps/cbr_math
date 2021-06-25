@@ -102,6 +102,10 @@ if(BUILD_TESTING)
 
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 
+  if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+    add_compile_options(-Wno-unused-local-typedef -Wno-mismatched-tags)
+  endif()
+
   # Math
   add_executable(${PROJECT_NAME}_test_math test/test_math.cpp)
   target_link_libraries(${PROJECT_NAME}_test_math PRIVATE ${PROJECT_NAME} GTest::Main)

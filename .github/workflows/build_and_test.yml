@@ -26,7 +26,21 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
           libgtest-dev \
-          libeigen3-dev
+          libeigen3-dev \
+          libboost-dev
+
+      - name: Checkout Sophus
+        uses: actions/checkout@v2
+        with:
+          repository: strasdat/Sophus
+          path: "tools/Sophus"
+      - name: Build and Install Sophus
+        run: |
+          mkdir ${{ github.workspace }}/tools/Sophus/build
+          cd ${{ github.workspace }}/tools/Sophus/build
+          cmake ..
+          make -j2
+          sudo make install
 
       - name: Configure CMake
         run: |
@@ -56,8 +70,9 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
           lcov \
           libgtest-dev \
-          libeigen3-dev
-          mkdir ${{ github.workspace }}/tools
+          libeigen3-dev \
+          libboost-dev
+          mkdir ${{ github.workspace }}/tools/
 
       - name: Checkout Sophus
         uses: actions/checkout@v2

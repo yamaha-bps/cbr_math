@@ -9,6 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Eigen3 3.3 REQUIRED)
 find_package(Sophus REQUIRED)
+find_package(Boost REQUIRED)
 
 # ---------------------------------------------------------------------------------------
 # TARGETS
@@ -100,6 +101,10 @@ if(BUILD_TESTING)
   find_package(GTest REQUIRED)
 
   add_compile_options(-Wall -Wextra -Wpedantic -Werror)
+
+  if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+    add_compile_options(-Wno-unused-local-typedef -Wno-mismatched-tags)
+  endif()
 
   # Math
   add_executable(${PROJECT_NAME}_test_math test/test_math.cpp)

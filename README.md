@@ -203,4 +203,4 @@ Project Link: [https://github.com/yamaha-bps/cbr_math](https://github.com/yamaha
 [issues-shield]: https://img.shields.io/github/issues/yamaha-bps/cbr_math.svg?style=for-the-badge
 [issues-url]: https://github.com/yamaha-bps/cbr_math/issues
 [license-shield]: https://img.shields.io/github/license/yamaha-bps/cbr_math.svg?style=for-the-badge
-[license-url]: https://github.com/yamaha-bps/cbr_math/blob/master/LICENSE.txt
+[license-url]: https://github.com/yamaha-bps/cbr_math/blob/master/LICENSE

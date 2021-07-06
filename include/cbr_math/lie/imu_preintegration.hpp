@@ -15,7 +15,7 @@
 #include "Tn.hpp"
 #include "group_product.hpp"
 
-namespace bps::preint
+namespace cbr
 {
 template<typename T>
 using State = cbr::lie::GroupProduct<
@@ -339,6 +339,6 @@ State<T> compute_relative_state(const Container<MeasBiased<T>> & measContainer)
 
   return State<T>(Pose<T>(rotationSeries.back(), positionSeries.back()), velocitySeries.back());
 }
-}  // namespace bps::preint
+}  // namespace cbr
 
 #endif  // CBR_MATH__LIE__IMU_PREINTEGRATION_HPP_

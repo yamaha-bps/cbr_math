@@ -169,16 +169,6 @@ TEST(Geodetic, geo2ecef)
     Eigen::Quaterniond qOut = cbr::geo::geo2ecef(qIn, ll);
     test(qOut);
   }
-  {
-    Sophus::SO3d so3In, so3Out;
-    cbr::geo::geo2ecef(so3In, ll, so3Out);
-    test(so3Out.unit_quaternion());
-  }
-  {
-    Sophus::SO3d so3In;
-    Sophus::SO3d so3Out = cbr::geo::geo2ecef(so3In, ll);
-    test(so3Out.unit_quaternion());
-  }
 }
 
 template<int First, int Last, typename Lambda>
@@ -259,37 +249,6 @@ TEST(Geodetic, imu2nwu)
           Eigen::Quaterniond qIn2 = cbr::geo::nwu2imu(qOut, lla);
           test.second(qOut);
           EXPECT_TRUE(qIn2.isApprox(qIn, 1e-12));
-        }
-        {
-          Sophus::SO3d so3In, so3Out, so3In2;
-          cbr::geo::imu2nwu(so3In, lla, so3Out);
-          cbr::geo::nwu2imu(so3Out, lla, so3In2);
-          test.second(so3Out.unit_quaternion());
-          EXPECT_TRUE(so3In2.unit_quaternion().isApprox(so3In.unit_quaternion(), 1e-12));
-        }
-        {
-          Sophus::SO3d so3In;
-          Sophus::SO3d so3Out = cbr::geo::imu2nwu(so3In, lla);
-          Sophus::SO3d so3In2 = cbr::geo::nwu2imu(so3Out, lla);
-          test.second(so3Out.unit_quaternion());
-          EXPECT_TRUE(so3In2.unit_quaternion().isApprox(so3In.unit_quaternion(), 1e-12));
-        }
-        {
-          Sophus::SE3d se3In, se3Out;
-          cbr::geo::imu2nwu(se3In, se3Out);
-          test.second(se3Out.so3().unit_quaternion());
-        }
-        {
-          Sophus::SE3d se3In;
-          Sophus::SE3d se3Out = cbr::geo::imu2nwu(se3In);
-          Sophus::SE3d se3In2 = cbr::geo::nwu2imu(se3Out);
-          test.second(se3Out.so3().unit_quaternion());
-          EXPECT_EQ(se3In.translation().x(), se3Out.translation().x());
-          EXPECT_EQ(se3In.translation().y(), se3Out.translation().y());
-          EXPECT_EQ(se3In.translation().z(), se3Out.translation().z());
-          EXPECT_TRUE(
-            se3In2.so3().unit_quaternion().isApprox(
-              se3In.so3().unit_quaternion(), 1e-12));
         }
       }
     });

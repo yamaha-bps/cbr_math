@@ -125,60 +125,6 @@ public:
     return PiecewisePolyND(std::move(x_ext), std::move(coefLists));
   }
 
-  /**
-   * @brief Create a Lie-valued piecewise constant polynomial
-   *
-   * @tparam T1 PiecewisePoly::row_t
-   * @tparam T2 container_t<LieType>
-   * @param x sorted breakpoints
-   * @param y values
-   *
-   * NOTE: this function is not tested
-   */
-  template<typename T1, typename T2>
-  static auto fitLie(
-    T1 && x,
-    T2 && poses)
-  {
-    static_assert(is_eigen_dense_v<T1>, "x must be an Eigen::DenseBase object.");
-
-    using Group = typename std::decay_t<T2>::value_type;
-    using GroupScalar = typename Group::Scalar;
-    constexpr static int Dimension = Group::DoF;
-
-    static_assert(std::is_same_v<GroupScalar, double>, "Group scalar must be a double.");
-
-    if (x.size() == 0) {
-      throw std::invalid_argument("x must be non-empty");
-    }
-
-    if (static_cast<std::size_t>(x.size()) != poses.size()) {
-      throw std::invalid_argument("x and poses must have the same size.");
-    }
-
-    // add a dummy datapoint at the end
-    const auto newsize = x.size() + 1;
-    row_t x_ext(newsize);
-    x_ext << x, x(x.size() - 1) + 1;
-
-    std::vector<Group> poses_ext(newsize);
-    for (auto i = 0u; i != poses.size(); ++i) {
-      poses_ext[i] = poses[i];
-    }
-    poses_ext.back() = poses.back();
-
-    std::vector<matrix_t> coefLists;
-    coefLists.reserve(Dimension);
-    for (int i = 0; i < Dimension; i++) {
-      coefLists.push_back(generateCoeffsLie(x_ext));
-    }
-
-    return PiecewisePolyLie<Group>(
-      std::move(x_ext),
-      std::move(coefLists),
-      std::move(poses_ext));
-  }
-
 protected:
   template<typename T1, typename T2>
   static matrix_t generateCoeffs(
@@ -199,21 +145,6 @@ protected:
     for (std::size_t i = 0; i < nj; i++) {
       coeffs(0, i) = y[i];
     }
-
-    return coeffs;
-  }
-
-  template<typename T1>
-  static matrix_t generateCoeffsLie(
-    const Eigen::DenseBase<T1> & x)
-  {
-    static_assert(
-      T1::IsVectorAtCompileTime,
-      "x and omega must be vectors.");
-
-    std::size_t nj = x.size() - 1;
-    matrix_t coeffs(1, nj);
-    coeffs.setZero();
 
     return coeffs;
   }

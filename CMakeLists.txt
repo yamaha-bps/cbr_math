@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(Eigen3 3.3 REQUIRED)
-find_package(Sophus REQUIRED)
 find_package(Boost REQUIRED)
 
 # ---------------------------------------------------------------------------------------
@@ -24,7 +23,6 @@ INTERFACE
 target_link_libraries(${PROJECT_NAME}
 INTERFACE
   Eigen3::Eigen
-  Sophus::Sophus
 )
 
 # ---------------------------------------------------------------------------------------
@@ -111,11 +109,6 @@ if(BUILD_TESTING)
   target_link_libraries(${PROJECT_NAME}_test_math PRIVATE ${PROJECT_NAME} GTest::Main)
   gtest_discover_tests(${PROJECT_NAME}_test_math)
 
-  # Sophus
-  add_executable(${PROJECT_NAME}_test_sophus test/test_sophus.cpp)
-  target_link_libraries(${PROJECT_NAME}_test_sophus PRIVATE ${PROJECT_NAME} GTest::Main)
-  gtest_discover_tests(${PROJECT_NAME}_test_sophus)
-
   # Geodetic
   add_executable(${PROJECT_NAME}_test_geodetic test/test_geodetic.cpp)
   target_link_libraries(${PROJECT_NAME}_test_geodetic PRIVATE ${PROJECT_NAME} GTest::Main)
@@ -125,10 +118,5 @@ if(BUILD_TESTING)
   add_executable(${PROJECT_NAME}_test_interp test/test_interp.cpp)
   target_link_libraries(${PROJECT_NAME}_test_interp PRIVATE ${PROJECT_NAME} GTest::Main)
   gtest_discover_tests(${PROJECT_NAME}_test_interp)
-
-  # Lie
-  add_executable(${PROJECT_NAME}_test_lie test/lie/test_lie_bspline.cpp test/lie/test_lie.cpp)
-  target_link_libraries(${PROJECT_NAME}_test_lie PRIVATE ${PROJECT_NAME} GTest::Main)
-  gtest_discover_tests(${PROJECT_NAME}_test_lie)
 endif()
 

@@ -10,7 +10,6 @@
   <license>MIT</license>
 
   <depend>eigen</depend>
-  <depend>sophus</depend>
 
   <buildtool_depend>cmake</buildtool_depend>
 

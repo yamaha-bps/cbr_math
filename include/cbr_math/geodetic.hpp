@@ -8,8 +8,6 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 
-#include <sophus/se3.hpp>
-
 #include <exception>
 #include <utility>
 
@@ -257,27 +255,6 @@ Eigen::Quaterniond geo2ecef(
   return qOut;
 }
 
-template<typename _ref = WGS84>
-void geo2ecef(
-  const Sophus::SO3d & so3In,
-  const Eigen::Ref<const Eigen::Vector2d> ll,
-  Sophus::SO3d & so3Out)
-{
-  Eigen::Map<Eigen::Quaterniond> qOut(so3Out.data());
-  geo2ecef<_ref>(so3In.unit_quaternion(), ll, qOut);
-}
-
-template<typename _ref = WGS84>
-Sophus::SO3d geo2ecef(
-  const Sophus::SO3d & so3In,
-  const Eigen::Ref<const Eigen::Vector2d> ll)
-{
-  Sophus::SO3d so3Out;
-  geo2ecef<_ref>(so3In, ll, so3Out);
-  return so3Out;
-}
-
-
 /***************************************************************************
  * \brief Converts geocentric north-west-up orientation into geographic one
  *  given geographic coordinates.
@@ -307,46 +284,6 @@ Eigen::Quaterniond imu2nwu(
   return qOut;
 }
 
-template<typename _ref = WGS84>
-void imu2nwu(
-  const Sophus::SO3d & so3In,
-  const Eigen::Ref<const Eigen::Vector3d> lla,
-  Sophus::SO3d & so3Out)
-{
-  Eigen::Map<Eigen::Quaterniond> qOut(so3Out.data());
-  imu2nwu<_ref>(so3In.unit_quaternion(), lla, qOut);
-}
-
-template<typename _ref = WGS84>
-Sophus::SO3d imu2nwu(
-  const Sophus::SO3d & so3In,
-  const Eigen::Ref<const Eigen::Vector3d> lla)
-{
-  Sophus::SO3d so3Out;
-  imu2nwu<_ref>(so3In, lla, so3Out);
-  return so3Out;
-}
-
-template<typename _ref = WGS84>
-void imu2nwu(
-  const Sophus::SE3d & se3In,
-  Sophus::SE3d & se3Out)
-{
-  Eigen::Map<Eigen::Quaterniond> qOut(se3Out.so3().data());
-  imu2nwu<_ref>(se3In.so3().unit_quaternion(), se3In.translation(), qOut);
-  se3Out.translation() = se3In.translation();
-}
-
-template<typename _ref = WGS84>
-Sophus::SE3d imu2nwu(
-  const Sophus::SE3d & se3In)
-{
-  Sophus::SE3d se3Out;
-  imu2nwu<_ref>(se3In, se3Out);
-  return se3Out;
-}
-
-
 /***************************************************************************
  * \brief Converts geographic north-west-up orientation into geocentric one
  *  given geographic coordinates.
@@ -375,46 +312,6 @@ Eigen::Quaterniond nwu2imu(
   nwu2imu<_ref>(qIn, lla, qOut);
   return qOut;
 }
-
-template<typename _ref = WGS84>
-void nwu2imu(
-  const Sophus::SO3d & so3In,
-  const Eigen::Ref<const Eigen::Vector3d> lla,
-  Sophus::SO3d & so3Out)
-{
-  Eigen::Map<Eigen::Quaterniond> qOut(so3Out.data());
-  nwu2imu<_ref>(so3In.unit_quaternion(), lla, qOut);
-}
-
-template<typename _ref = WGS84>
-Sophus::SO3d nwu2imu(
-  const Sophus::SO3d & so3In,
-  const Eigen::Ref<const Eigen::Vector3d> lla)
-{
-  Sophus::SO3d so3Out;
-  nwu2imu<_ref>(so3In, lla, so3Out);
-  return so3Out;
-}
-
-template<typename _ref = WGS84>
-void nwu2imu(
-  const Sophus::SE3d & se3In,
-  Sophus::SE3d & se3Out)
-{
-  Eigen::Map<Eigen::Quaterniond> qOut(se3Out.so3().data());
-  nwu2imu<_ref>(se3In.so3().unit_quaternion(), se3In.translation(), qOut);
-  se3Out.translation() = se3In.translation();
-}
-
-template<typename _ref = WGS84>
-Sophus::SE3d nwu2imu(
-  const Sophus::SE3d & se3In)
-{
-  Sophus::SE3d se3Out;
-  nwu2imu<_ref>(se3In, se3Out);
-  return se3Out;
-}
-
 
 /***************************************************************************
  * \brief Computes gnomonic projection of lla onto the plane tangent to the
@@ -583,25 +480,6 @@ Eigen::Vector3d lla2nwu(
   return nwu;
 }
 
-template<typename _ref = WGS84>
-void lla2nwu(
-  const Eigen::Ref<const Eigen::Vector3d> lla,
-  const Sophus::SE3d llaRef,
-  Eigen::Ref<Eigen::Vector3d> nwu)
-{
-  lla2nwu<_ref>(lla, llaRef.translation(), llaRef.so3().unit_quaternion(), nwu);
-}
-
-template<typename _ref = WGS84>
-Eigen::Vector3d lla2nwu(
-  const Eigen::Ref<const Eigen::Vector3d> lla,
-  const Sophus::SE3d llaRef)
-{
-  Eigen::Vector3d nwu;
-  lla2nwu<_ref>(lla, llaRef, nwu);
-  return nwu;
-}
-
 /***************************************************************************
  * \brief Transforms a geographic frame into north-west-up one.
  ***************************************************************************/
@@ -638,52 +516,6 @@ void lla2nwu(
   Eigen::QuaternionBase<derived2> & qNwu)
 {
   lla2nwu<_ref>(lla, q, llaRef, Eigen::Quaterniond::Identity(), nwu, qNwu);
-}
-
-template<typename _ref = WGS84>
-void lla2nwu(
-  const Sophus::SE3d & lla,
-  const Sophus::SE3d & llaRef,
-  Sophus::SE3d & nwu)
-{
-  Eigen::Map<Eigen::Quaterniond> qOut(nwu.so3().data());
-  lla2nwu<_ref>(
-    lla.translation(), lla.so3().unit_quaternion(),
-    llaRef.translation(), llaRef.so3().unit_quaternion(),
-    nwu.translation(), qOut);
-}
-
-template<typename _ref = WGS84>
-Sophus::SE3d lla2nwu(
-  const Sophus::SE3d & lla,
-  const Sophus::SE3d & llaRef)
-{
-  Sophus::SE3d nwu;
-  lla2nwu<_ref>(lla, llaRef, nwu);
-  return nwu;
-}
-
-template<typename _ref = WGS84>
-void lla2nwu(
-  const Sophus::SE3d & lla,
-  const Eigen::Ref<const Eigen::Vector3d> llaRef,
-  Sophus::SE3d & nwu)
-{
-  Eigen::Map<Eigen::Quaterniond> qOut(nwu.so3().data());
-  lla2nwu<_ref>(
-    lla.translation(), lla.so3().unit_quaternion(),
-    llaRef,
-    nwu.translation(), qOut);
-}
-
-template<typename _ref = WGS84>
-Sophus::SE3d lla2nwu(
-  const Sophus::SE3d & lla,
-  const Eigen::Ref<const Eigen::Vector3d> llaRef)
-{
-  Sophus::SE3d nwu;
-  lla2nwu<_ref>(lla, llaRef, nwu);
-  return nwu;
 }
 
 /***************************************************************************
@@ -734,26 +566,6 @@ Eigen::Vector3d nwu2lla(
   return lla;
 }
 
-template<typename _ref = WGS84>
-void nwu2lla(
-  const Eigen::Ref<const Eigen::Vector3d> nwu,
-  const Sophus::SE3d llaRef,
-  Eigen::Ref<Eigen::Vector3d> lla)
-{
-  nwu2lla<_ref>(nwu, llaRef.translation(), llaRef.so3().unit_quaternion(), lla);
-}
-
-template<typename _ref = WGS84>
-Eigen::Vector3d nwu2lla(
-  const Eigen::Ref<const Eigen::Vector3d> nwu,
-  const Sophus::SE3d llaRef)
-{
-  Eigen::Vector3d lla;
-  nwu2lla<_ref>(nwu, llaRef, lla);
-  return lla;
-}
-
-
 /***************************************************************************
  * \brief Transforms a north-west-up frame into a geographic one.
  ***************************************************************************/
@@ -792,53 +604,6 @@ void nwu2lla(
 {
   nwu2lla<_ref>(lla, q, llaRef, Eigen::Quaterniond::Identity(), nwu, qNwu);
 }
-
-template<typename _ref = WGS84>
-void nwu2lla(
-  const Sophus::SE3d & lla,
-  const Sophus::SE3d & llaRef,
-  Sophus::SE3d & nwu)
-{
-  Eigen::Map<Eigen::Quaterniond> qOut(nwu.so3().data());
-  nwu2lla<_ref>(
-    lla.translation(), lla.so3().unit_quaternion(),
-    llaRef.translation(), llaRef.so3().unit_quaternion(),
-    nwu.translation(), qOut);
-}
-
-template<typename _ref = WGS84>
-Sophus::SE3d nwu2lla(
-  const Sophus::SE3d & lla,
-  const Sophus::SE3d & llaRef)
-{
-  Sophus::SE3d nwu;
-  nwu2lla<_ref>(lla, llaRef, nwu);
-  return nwu;
-}
-
-template<typename _ref = WGS84>
-void nwu2lla(
-  const Sophus::SE3d & lla,
-  const Eigen::Ref<const Eigen::Vector3d> llaRef,
-  Sophus::SE3d & nwu)
-{
-  Eigen::Map<Eigen::Quaterniond> qOut(nwu.so3().data());
-  nwu2lla<_ref>(
-    lla.translation(), lla.so3().unit_quaternion(),
-    llaRef,
-    nwu.translation(), qOut);
-}
-
-template<typename _ref = WGS84>
-Sophus::SE3d nwu2lla(
-  const Sophus::SE3d & lla,
-  const Eigen::Ref<const Eigen::Vector3d> llaRef)
-{
-  Sophus::SE3d nwu;
-  nwu2lla<_ref>(lla, llaRef, nwu);
-  return nwu;
-}
-
 
 /***************************************************************************
  * \brief Returns cartesian distance in the earth-centered-earth-fixed frame

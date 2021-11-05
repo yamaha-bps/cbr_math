@@ -97,6 +97,20 @@ Eigen::Vector3d lla2ecef(const Eigen::Ref<const Eigen::Vector3d> lla)
   return ecef;
 }
 
+// forward-declaration
+template<typename _ref = WGS84>
+Eigen::Matrix3d geo2ecef(const Eigen::Ref<const Eigen::Vector2d> ll);
+
+template<typename _ref = WGS84, typename derived>
+std::pair<Eigen::Vector3d, Eigen::Quaterniond> lla2ecef(
+  const Eigen::Ref<const Eigen::Vector3d> lla,
+  const Eigen::QuaternionBase<derived> & R_NWU)
+{
+  const Eigen::Vector3d T_W_S = lla2ecef<_ref>(lla);
+  const Eigen::Quaterniond R_W_NWU(geo2ecef<_ref>(lla.template head<2>()));
+
+  return {T_W_S, R_W_NWU * R_NWU};
+}
 
 /***************************************************************************
  * \brief Converts earth-centered-earth-fixed (ecef) coordinates into
@@ -179,6 +193,16 @@ Eigen::Vector3d ecef2lla(const Eigen::Ref<const Eigen::Vector3d> ecef)
   return lla;
 }
 
+template<typename _ref = WGS84, typename derived>
+std::pair<Eigen::Vector3d, Eigen::Quaterniond> ecef2lla(
+  const Eigen::Ref<const Eigen::Vector3d> T_ecef,
+  const Eigen::QuaternionBase<derived> & q_ecef)
+{
+  const Eigen::Vector3d lla = ecef2lla<_ref>(T_ecef);
+  const Eigen::Matrix3d R_W_NWU = geo2ecef<_ref>(lla.head<2>());
+
+  return {lla, Eigen::Quaterniond(R_W_NWU.transpose()) * q_ecef};
+}
 
 /***************************************************************************
  * \brief Converts earth-centered-earth-fixed (ecef) coordinates into
@@ -225,7 +249,7 @@ void geo2ecef(
     cosTheta, 0., sinTheta;
 }
 
-template<typename _ref = WGS84>
+template<typename _ref>
 Eigen::Matrix3d geo2ecef(
   const Eigen::Ref<const Eigen::Vector2d> ll)
 {

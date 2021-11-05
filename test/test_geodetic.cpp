@@ -400,3 +400,62 @@ TEST(Geodetic, nwu2lla_rot)
   ASSERT_NEAR(quat.y(), 0, 1e-10);
   ASSERT_NEAR(quat.z(), 0, 1e-10);
 }
+
+TEST(Geodetic, ecef2lla_pose)
+{
+  {
+    // at equator x 0
+    Eigen::Vector3d lla(0, 0, 5);
+    Eigen::Quaterniond q_nwu = Eigen::Quaterniond::Identity();
+
+    auto P_ecef = cbr::geo::lla2ecef(lla, q_nwu);
+
+    Eigen::Quaterniond q_ecef(P_ecef.rotation());
+    Eigen::Matrix3d R_test = (Eigen::Matrix3d() << 0, 0, 1, 0, -1, 0, 1, 0, 0).finished();
+    Eigen::Quaterniond q_test(R_test);
+
+    ASSERT_TRUE(P_ecef.translation().isApprox(Eigen::Vector3d(cbr::geo::WGS84::a + 5, 0, 0)));
+    ASSERT_TRUE(q_ecef.isApprox(q_test));
+
+    auto [lla_copy, q_nwu_copy] = cbr::geo::ecef2lla(P_ecef);
+    ASSERT_TRUE(lla_copy.isApprox(lla));
+    ASSERT_TRUE(q_nwu_copy.isApprox(q_nwu));
+  }
+
+  {
+    // at equator 0 y
+    Eigen::Vector3d lla(0, M_PI_2, 5);
+    Eigen::Quaterniond q_nwu = Eigen::Quaterniond::Identity();
+
+    auto P_ecef = cbr::geo::lla2ecef(lla, q_nwu);
+
+    Eigen::Quaterniond q_ecef(P_ecef.rotation());
+    Eigen::Matrix3d R_test = (Eigen::Matrix3d() << 0, 1, 0, 0, 0, 1, 1, 0, 0).finished();
+    Eigen::Quaterniond q_test(R_test);
+
+    ASSERT_TRUE(P_ecef.translation().isApprox(Eigen::Vector3d(0, cbr::geo::WGS84::a + 5, 0)));
+    ASSERT_TRUE(q_ecef.isApprox(q_test));
+
+    auto [lla_copy, q_nwu_copy] = cbr::geo::ecef2lla(P_ecef);
+    ASSERT_TRUE(lla_copy.isApprox(lla));
+    ASSERT_TRUE(q_nwu_copy.isApprox(q_nwu));
+  }
+
+  // random llas
+  srand(5);
+  for (auto i = 0u; i < 10u; ++i) {
+    Eigen::Vector3d lla = Eigen::Vector3d::Random();
+    Eigen::Quaterniond q_nwu = Eigen::Quaterniond::UnitRandom();
+
+    const Eigen::Isometry3d P_ecef = cbr::geo::lla2ecef(lla, q_nwu);
+    auto [lla_copy, q_nwu_copy] = cbr::geo::ecef2lla(P_ecef);
+    const Eigen::Isometry3d P_ecef_copy = cbr::geo::lla2ecef(lla_copy, q_nwu_copy);
+
+    if (q_nwu.w() < 0) { q_nwu.coeffs() *= -1; }
+    if (q_nwu_copy.w() < 0) { q_nwu_copy.coeffs() *= -1; }
+
+    ASSERT_TRUE(lla_copy.isApprox(lla, 1e-8));
+    ASSERT_TRUE(q_nwu_copy.isApprox(q_nwu));
+    ASSERT_TRUE(P_ecef_copy.isApprox(P_ecef));
+  }
+}

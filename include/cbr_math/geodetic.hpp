@@ -102,14 +102,14 @@ template<typename _ref = WGS84>
 Eigen::Matrix3d geo2ecef(const Eigen::Ref<const Eigen::Vector2d> ll);
 
 template<typename _ref = WGS84, typename derived>
-Eigen::Isometry3d lla2ecef(
+std::pair<Eigen::Vector3d, Eigen::Quaterniond> lla2ecef(
   const Eigen::Ref<const Eigen::Vector3d> lla,
   const Eigen::QuaternionBase<derived> & R_NWU)
 {
   const Eigen::Vector3d T_W_S = lla2ecef<_ref>(lla);
   const Eigen::Quaterniond R_W_NWU(geo2ecef<_ref>(lla.template head<2>()));
 
-  return Eigen::Translation3d(T_W_S) * (R_W_NWU * R_NWU);
+  return {T_W_S, R_W_NWU * R_NWU};
 }
 
 /***************************************************************************
@@ -193,15 +193,16 @@ Eigen::Vector3d ecef2lla(const Eigen::Ref<const Eigen::Vector3d> ecef)
   return lla;
 }
 
-template<typename _ref = WGS84>
-std::pair<Eigen::Vector3d, Eigen::Quaterniond> ecef2lla(const Eigen::Isometry3d & P_ecef)
+template<typename _ref = WGS84, typename derived>
+std::pair<Eigen::Vector3d, Eigen::Quaterniond> ecef2lla(
+  const Eigen::Ref<const Eigen::Vector3d> T_ecef,
+  const Eigen::QuaternionBase<derived> & q_ecef)
 {
-  const Eigen::Vector3d lla = ecef2lla<_ref>(P_ecef.translation());
+  const Eigen::Vector3d lla = ecef2lla<_ref>(T_ecef);
   const Eigen::Matrix3d R_W_NWU = geo2ecef<_ref>(lla.head<2>());
 
-  return {lla, Eigen::Quaterniond(R_W_NWU.transpose() * P_ecef.rotation())};
+  return {lla, Eigen::Quaterniond(R_W_NWU.transpose()) * q_ecef};
 }
-
 
 /***************************************************************************
  * \brief Converts earth-centered-earth-fixed (ecef) coordinates into

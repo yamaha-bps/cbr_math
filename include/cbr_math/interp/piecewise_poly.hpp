@@ -202,7 +202,7 @@ protected:
               throw std::runtime_error("Point outside break points range. Should never happen!");
             }
 
-            if (breakPoints_[idx] >= x) {
+            if (breakPoints_[static_cast<Eigen::Index>(idx)] >= x) {
               if (idx == length_ - 1) {
                 idx--;
               }
@@ -252,7 +252,7 @@ protected:
 
     if (forward) {
       for (; idx <= (length_ - 2); idx++) {
-        if (breakPoints_[idx] <= x && x < breakPoints_[idx + 1]) {
+        if (breakPoints_[static_cast<Eigen::Index>(idx)] <= x && x < breakPoints_[idx + 1]) {
           return true;
         }
       }
@@ -262,7 +262,9 @@ protected:
         return true;
       }
       for (; idx > 0; idx--) {
-        if (breakPoints_[idx] <= x && x < breakPoints_[idx + 1]) {
+        if (breakPoints_[static_cast<Eigen::Index>(idx)] <= x &&
+          x < breakPoints_[static_cast<Eigen::Index>(idx + 1)])
+        {
           return true;
         }
       }
@@ -281,18 +283,22 @@ protected:
     const double x,
     std::size_t & idx) const noexcept
   {
-    if (length_ < 2 || x < breakPoints_[0] || x >= breakPoints_[length_ - 1]) {
+    if (length_ < 2 || x < breakPoints_[0] ||
+      x >= breakPoints_[static_cast<Eigen::Index>(length_ - 1)])
+    {
       return false;
     }
 
     std::size_t low{0}, high{length_ - 1};
 
     while (low < high) {
-      const double frac = (x - breakPoints_[low]) / (breakPoints_[high] - breakPoints_[low]);
+      const double frac = (x - breakPoints_[static_cast<Eigen::Index>(low)]) /
+        (breakPoints_[static_cast<Eigen::Index>(high)] -
+        breakPoints_[static_cast<Eigen::Index>(low)]);
       idx = low + static_cast<std::size_t>(frac * static_cast<double>(high - low));
-      if (x < breakPoints_[idx]) {
+      if (x < breakPoints_[static_cast<Eigen::Index>(idx)]) {
         high = idx;
-      } else if (x >= breakPoints_[idx + 1]) {
+      } else if (x >= breakPoints_[static_cast<Eigen::Index>(idx) + 1]) {
         low = idx + 1;
       } else {
         break;  // we have breakPoints_[idx] <= t < breakPoints_[idx+1]
@@ -310,7 +316,7 @@ protected:
     const std::size_t order) const
   {
     T val = static_cast<T>(coefList(order - 1, pieceIdx));
-    const auto & x0 = breakPoints_[pieceIdx];
+    const auto & x0 = breakPoints_[static_cast<Eigen::Index>(pieceIdx)];
     for (std::size_t i = 1; i < order; i++) {
       val += static_cast<T>(coefList(order - 1 - i, pieceIdx)) * powFast<T, std::size_t>(
         x - static_cast<T>(x0), i);
@@ -333,7 +339,7 @@ protected:
       T val{0.};
 
       if (n < order) {
-        const auto & x0 = breakPoints_[pieceIdx];
+        const auto & x0 = breakPoints_[static_cast<Eigen::Index>(pieceIdx)];
         for (std::size_t i = n; i < order; i++) {
           val +=
             static_cast<T>(factorial(i, i - n + 1)) * static_cast<T>(coefList(

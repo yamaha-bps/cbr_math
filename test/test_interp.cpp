@@ -366,7 +366,7 @@ TEST(PiecewisePoly, PiecewisePolyND)
 
   double expectedVal = 1.;
   double expectedDer = 0.;
-  for (std::size_t i = 0; i < poly.dimension(); i++) {
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(poly.dimension()); i++) {
     expectedVal *= 2.;
     EXPECT_NEAR(val[i], expectedVal, eps);
     EXPECT_NEAR(der[i], expectedDer, eps);
@@ -404,8 +404,11 @@ TEST(PiecewisePoly, PiecewisePolyND)
   const auto ders1 = poly.ders(xsv);
   const auto ders2 = poly.ders(xsm);
 
-  for (std::size_t i = 0; i < poly.dimension(); i++) {
-    for (std::size_t j = 0; j < xs.size(); j++) {
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wunused-value"
+  #pragma GCC diagnostic ignored "-Wconversion"
+  for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(poly.dimension()); i++) {
+    for (Eigen::Index j = 0; j < static_cast<Eigen::Index>(xs.size()); j++) {
       EXPECT_NEAR(vals0[j][i], vals1[j][i], eps);
       EXPECT_NEAR(vals0[j][i], vals2(i, j), eps);
 
@@ -413,6 +416,8 @@ TEST(PiecewisePoly, PiecewisePolyND)
       EXPECT_NEAR(ders0[j][i], ders2(i, j), eps);
     }
   }
+  #pragma GCC diagnostic pop
+
 }
 
 TEST(PiecewisePoly, PiecewiseConstantFit)
@@ -490,13 +495,14 @@ TEST(PiecewisePoly, PiecewiseConstantFit)
   const auto ppNDv = cbr::PiecewiseConstant::fitND(x, yv);
   const auto ppNDa = cbr::PiecewiseConstant::fitND(x, ya);
 
-  const Eigen::Map<const PiecewisePoly::row_t> xsm(xs.data(), 1, xs.size());
+  const Eigen::Map<const PiecewisePoly::row_t> xsm(xs.data(), 1,
+    static_cast<Eigen::Index>(xs.size()));
   const auto valss = ppND.vals(xsm);
   const auto valssv = ppNDv.vals(xsm);
   const auto valssa = ppNDa.vals(xsm);
 
-  for (std::size_t j = 0; j < xs.size(); j++) {
-    for (std::size_t i = 0; i < ppND.dimension(); i++) {
+  for (Eigen::Index j = 0; j < static_cast<Eigen::Index>(xs.size()); j++) {
+    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(ppND.dimension()); i++) {
       ASSERT_DOUBLE_EQ(valss(i, j), valssv(i, j));
       ASSERT_DOUBLE_EQ(valss(i, j), valssa(i, j));
     }
@@ -608,13 +614,14 @@ TEST(PiecewisePoly, PiecewiseLinearFit)
   const auto ppNDv = cbr::PiecewiseLinear::fitND(x, yv);
   const auto ppNDa = cbr::PiecewiseLinear::fitND(x, ya);
 
-  const Eigen::Map<const PiecewisePoly::row_t> xsm(xs.data(), 1, xs.size());
+  const Eigen::Map<const PiecewisePoly::row_t> xsm(xs.data(), 1,
+    static_cast<Eigen::Index>(xs.size()));
   const auto valss = ppND.vals(xsm);
   const auto valssv = ppNDv.vals(xsm);
   const auto valssa = ppNDa.vals(xsm);
 
-  for (std::size_t j = 0; j < xs.size(); j++) {
-    for (std::size_t i = 0; i < ppND.dimension(); i++) {
+  for (Eigen::Index j = 0; j < static_cast<Eigen::Index>(xs.size()); j++) {
+    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(ppND.dimension()); i++) {
       ASSERT_DOUBLE_EQ(valss(i, j), valssv(i, j));
       ASSERT_DOUBLE_EQ(valss(i, j), valssa(i, j));
     }
@@ -898,13 +905,14 @@ TEST(PiecewisePoly, SplineFit)
   const auto ppNDa = cbr::Spline::fitND(x, ya);
   const auto ppNDd = cbr::Spline::fitND(x, yd);
 
-  const Eigen::Map<const PiecewisePoly::row_t> xsm(xs.data(), 1, xs.size());
+  const Eigen::Map<const PiecewisePoly::row_t> xsm(xs.data(), 1,
+    static_cast<Eigen::Index>(xs.size()));
   const auto valss = ppND.vals(xsm);
   const auto valssv = ppNDv.vals(xsm);
   const auto valssa = ppNDa.vals(xsm);
 
-  for (std::size_t j = 0; j < xs.size(); j++) {
-    for (std::size_t i = 0; i < ppND.dimension(); i++) {
+  for (Eigen::Index j = 0; j < static_cast<Eigen::Index>(xs.size()); j++) {
+    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(ppND.dimension()); i++) {
       EXPECT_NEAR(valss(i, j), valssv(i, j), eps);
       EXPECT_NEAR(valss(i, j), valssa(i, j), eps);
     }
@@ -916,8 +924,8 @@ TEST(PiecewisePoly, SplineFit)
   const auto valssd = ppND.vals(x);
   const auto valssdd = ppNDd.vals(x);
 
-  for (Eigen::Index j = 0; j < x.size(); j++) {
-    for (std::size_t i = 0; i < ppND.dimension(); i++) {
+  for (Eigen::Index j = 0; j < static_cast<Eigen::Index>(x.size()); j++) {
+    for (Eigen::Index i = 0; i < static_cast<Eigen::Index>(ppND.dimension()); i++) {
       EXPECT_NEAR(valssd(i, j), valssdd(i, j), eps);
     }
     EXPECT_NEAR(valssdd(1, j), valssdd(0, j) + 1., eps);

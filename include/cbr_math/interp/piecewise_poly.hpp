@@ -252,7 +252,9 @@ protected:
 
     if (forward) {
       for (; idx <= (length_ - 2); idx++) {
-        if (breakPoints_[static_cast<Eigen::Index>(idx)] <= x && x < breakPoints_[idx + 1]) {
+        if (breakPoints_[static_cast<Eigen::Index>(idx)] <= x &&
+          x < breakPoints_[static_cast<Eigen::Index>(idx + 1)])
+        {
           return true;
         }
       }
@@ -315,10 +317,16 @@ protected:
     const matrix_t & coefList,
     const std::size_t order) const
   {
-    T val = static_cast<T>(coefList(order - 1, pieceIdx));
+    T val =
+      static_cast<T>(coefList(
+        static_cast<Eigen::Index>(order - 1),
+        static_cast<Eigen::Index>(pieceIdx)));
     const auto & x0 = breakPoints_[static_cast<Eigen::Index>(pieceIdx)];
     for (std::size_t i = 1; i < order; i++) {
-      val += static_cast<T>(coefList(order - 1 - i, pieceIdx)) * powFast<T, std::size_t>(
+      val +=
+        static_cast<T>(coefList(
+          static_cast<Eigen::Index>(order - 1 - i),
+          static_cast<Eigen::Index>(pieceIdx))) * powFast<T, std::size_t>(
         x - static_cast<T>(x0), i);
     }
     return val;
@@ -343,8 +351,8 @@ protected:
         for (std::size_t i = n; i < order; i++) {
           val +=
             static_cast<T>(factorial(i, i - n + 1)) * static_cast<T>(coefList(
-              order - 1 - i,
-              pieceIdx)) *
+              static_cast<Eigen::Index>(order - 1 - i),
+              static_cast<Eigen::Index>(pieceIdx))) *
             powFast<T, std::size_t>(
             x - static_cast<T>(x0),
             i - n);
@@ -501,9 +509,9 @@ public:
     extremities_.val0 = evalPoly<double>(breakPoints_[0], 0, coefList_, order_);
     extremities_.der0 = evalPolyDer<double>(breakPoints_[0], 0, 1, coefList_, order_);
     extremities_.valEnd = evalPoly<double>(
-      breakPoints_[length_ - 1], length_ - 2, coefList_, order_);
+      breakPoints_[static_cast<Eigen::Index>(length_ - 1)], length_ - 2, coefList_, order_);
     extremities_.derEnd = evalPolyDer<double>(
-      breakPoints_[length_ - 1], length_ - 2, 1, coefList_,
+      breakPoints_[static_cast<Eigen::Index>(length_ - 1)], length_ - 2, 1, coefList_,
       order_);
   }
 
@@ -687,8 +695,12 @@ public:
       extremities_.emplace_back(
         evalPoly<double>(breakPoints_[0], 0, coefList, orders_.back()),
         evalPolyDer<double>(breakPoints_[0], 0, 1, coefList, orders_.back()),
-        evalPoly<double>(breakPoints_[length_ - 1], length_ - 2, coefList, orders_.back()),
-        evalPolyDer<double>(breakPoints_[length_ - 1], length_ - 2, 1, coefList, orders_.back())
+        evalPoly<double>(
+          breakPoints_[static_cast<Eigen::Index>(length_ - 1)], length_ - 2,
+          coefList, orders_.back()),
+        evalPolyDer<double>(
+          breakPoints_[static_cast<Eigen::Index>(length_ - 1)], length_ - 2, 1,
+          coefList, orders_.back())
       );
     }
   }
@@ -701,11 +713,13 @@ public:
     const auto [pieceIdx, flag] = findPosition(static_cast<double>(x));
     if (flag == 0) {
       for (std::size_t i = 0; i < N_; i++) {
-        out[i] = evalPoly<T>(x, pieceIdx, coefLists_[i], orders_[i]);
+        out[static_cast<Eigen::Index>(i)] = evalPoly<T>(x, pieceIdx, coefLists_[i], orders_[i]);
       }
     } else {
       for (std::size_t i = 0; i < N_; i++) {
-        out[i] = extrapPoly<T>(flag, x, 0, coefLists_[i], orders_[i], extremities_[i]);
+        out[static_cast<Eigen::Index>(i)] = extrapPoly<T>(
+          flag, x, 0, coefLists_[i], orders_[i],
+          extremities_[i]);
       }
     }
 
@@ -757,11 +771,14 @@ public:
     const auto [pieceIdx, flag] = findPosition(static_cast<double>(x));
     if (flag == 0) {
       for (std::size_t i = 0; i < N_; i++) {
-        out[i] = evalPolyDer<T>(x, pieceIdx, n, coefLists_[i], orders_[i]);
+        out[static_cast<Eigen::Index>(i)] =
+          evalPolyDer<T>(x, pieceIdx, n, coefLists_[i], orders_[i]);
       }
     } else {
       for (std::size_t i = 0; i < N_; i++) {
-        out[i] = extrapPoly<T>(flag, x, n, coefLists_[i], orders_[i], extremities_[i]);
+        out[static_cast<Eigen::Index>(i)] = extrapPoly<T>(
+          flag, x, n, coefLists_[i], orders_[i],
+          extremities_[i]);
       }
     }
 
@@ -789,7 +806,7 @@ public:
     static_assert(N > 0, "Input must be of size > 0.");
 
     std::array<col_t<T>, N> out;
-    for (size_t i = 0; i < N; i++) {
+    for (std::size_t i = 0; i < N; i++) {
       out[i] = der<T>(xs[i], n);
     }
     return out;

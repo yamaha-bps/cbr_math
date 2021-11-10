@@ -98,7 +98,7 @@ public:
       matrix_t ys_ext(ys.rows(), newsize);
       ys_ext << ys, ys.col(ys.cols() - 1);
 
-      coefLists.reserve(ys_ext.rows());
+      coefLists.reserve(static_cast<std::size_t>(ys_ext.rows()));
 
       for (Eigen::Index i = 0; i < ys_ext.rows(); i++) {
         coefLists.push_back(generateCoeffs(x_ext, ys_ext.row(i)));
@@ -139,10 +139,10 @@ protected:
       throw std::invalid_argument("Each element of ys must have the same size as x.");
     }
 
-    std::size_t nj = x.size() - 1;
+    Eigen::Index nj = x.size() - 1;
     matrix_t coeffs(1, nj);
 
-    for (std::size_t i = 0; i < nj; i++) {
+    for (Eigen::Index i = 0; i < nj; i++) {
       coeffs(0, i) = y[i];
     }
 

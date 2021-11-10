@@ -20,21 +20,21 @@ TEST(PiecewisePoly, Construct)
 
   PiecewisePoly::row_t bp(1, 1);
   PiecewisePoly::matrix_t coeffs(1, 1);
-  ASSERT_ANY_THROW(PiecewisePoly pp(bp, coeffs));
+  ASSERT_ANY_THROW(PiecewisePoly(bp, coeffs));
 
   bp.resize(1, 2);
   coeffs.resize(1, 2);
-  ASSERT_ANY_THROW(PiecewisePoly pp(bp, coeffs));
+  ASSERT_ANY_THROW(PiecewisePoly(bp, coeffs));
 
   bp.resize(1, 3);
   bp << 0., 1., 2.;
   coeffs.resize(1, 2);
-  ASSERT_NO_THROW(PiecewisePoly pp(bp, coeffs));
+  ASSERT_NO_THROW(PiecewisePoly(bp, coeffs));
 
   bp.resize(1, 4);
   bp << 0., 1., 2., 3.;
   coeffs.resize(1, 3);
-  ASSERT_NO_THROW(PiecewisePoly pp(bp, coeffs));
+  ASSERT_NO_THROW(PiecewisePoly(bp, coeffs));
 
   PiecewisePoly pp(bp, coeffs);
   auto lb = pp.lb();
@@ -49,21 +49,21 @@ TEST(PiecewisePoly, Construct)
 
   bp.resize(1, 4);
   coeffs.resize(1, 2);
-  ASSERT_ANY_THROW(PiecewisePoly pp(bp, coeffs));
+  ASSERT_ANY_THROW(PiecewisePoly(bp, coeffs));
 
   bp.resize(1, 6);
   coeffs.resize(1, 5);
   bp << 0., 1., 2., 3., 4., 5.;
-  ASSERT_NO_THROW(PiecewisePoly pp(bp, coeffs));
+  ASSERT_NO_THROW(PiecewisePoly(bp, coeffs));
 
   bp << 0., 1., 1., 3., 4., 5.;
-  ASSERT_ANY_THROW(PiecewisePoly pp(bp, coeffs));
+  ASSERT_ANY_THROW(PiecewisePoly(bp, coeffs));
 
   bp << 0., 2., 1., 3., 4., 5.;
-  ASSERT_ANY_THROW(PiecewisePoly pp(bp, coeffs));
+  ASSERT_ANY_THROW(PiecewisePoly(bp, coeffs));
 
   coeffs.resize(0, 5);
-  ASSERT_ANY_THROW(PiecewisePoly pp(bp, coeffs));
+  ASSERT_ANY_THROW(PiecewisePoly(bp, coeffs));
 }
 
 TEST(PiecewisePoly, Eval)

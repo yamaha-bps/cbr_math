@@ -289,7 +289,7 @@ protected:
 
     while (low < high) {
       const double frac = (x - breakPoints_[low]) / (breakPoints_[high] - breakPoints_[low]);
-      idx = low + static_cast<std::size_t>(frac * (high - low));
+      idx = low + static_cast<std::size_t>(frac * static_cast<double>(high - low));
       if (x < breakPoints_[idx]) {
         high = idx;
       } else if (x >= breakPoints_[idx + 1]) {
@@ -309,10 +309,11 @@ protected:
     const matrix_t & coefList,
     const std::size_t order) const
   {
-    T val = coefList(order - 1, pieceIdx);
+    T val = static_cast<T>(coefList(order - 1, pieceIdx));
     const auto & x0 = breakPoints_[pieceIdx];
     for (std::size_t i = 1; i < order; i++) {
-      val += coefList(order - 1 - i, pieceIdx) * powFast<T, std::size_t>(x - x0, i);
+      val += static_cast<T>(coefList(order - 1 - i, pieceIdx)) * powFast<T, std::size_t>(
+        x - static_cast<T>(x0), i);
     }
     return val;
   }
@@ -334,9 +335,12 @@ protected:
       if (n < order) {
         const auto & x0 = breakPoints_[pieceIdx];
         for (std::size_t i = n; i < order; i++) {
-          val += factorial(i, i - n + 1) * coefList(order - 1 - i, pieceIdx) *
+          val +=
+            static_cast<T>(factorial(i, i - n + 1)) * static_cast<T>(coefList(
+              order - 1 - i,
+              pieceIdx)) *
             powFast<T, std::size_t>(
-            x - x0,
+            x - static_cast<T>(x0),
             i - n);
         }
       }
@@ -358,17 +362,17 @@ protected:
       switch (extrap_) {
         case EXTRAP::CLAMP: {
             if (n == 0) {
-              return ex.valEnd;
+              return static_cast<T>(ex.valEnd);
             }
             return T{0.};
           }
 
         case EXTRAP::LINEAR: {
             if (n == 0) {
-              return ex.valEnd + ex.derEnd * (x - xEnd_);
+              return static_cast<T>(ex.valEnd + ex.derEnd * (x - xEnd_));
             }
             if (n == 1) {
-              return ex.derEnd;
+              return static_cast<T>(ex.derEnd);
             }
             return T{0.};
           }
@@ -388,16 +392,16 @@ protected:
       switch (extrap_) {
         case EXTRAP::CLAMP: {
             if (n == 0) {
-              return ex.val0;
+              return static_cast<T>(ex.val0);
             }
             return T{0.};
           }
         case EXTRAP::LINEAR: {
             if (n == 0) {
-              return ex.val0 + ex.der0 * (x - x0_);
+              return static_cast<T>(ex.val0 + ex.der0 * (x - x0_));
             }
             if (n == 1) {
-              return ex.der0;
+              return static_cast<T>(ex.der0);
             }
             return T{0.};
           }

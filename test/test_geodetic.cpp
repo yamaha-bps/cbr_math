@@ -308,16 +308,16 @@ TEST(Geodetic, lla2gnomonic)
 
   for (std::size_t i = 0; i < llas.size(); i++) {
     for (std::size_t j = 0; j < llas.size(); j++) {
-      const auto & lla = llas[i];
-      const auto & llaRef = llas[j];
+      const auto & llaTmp = llas[i];
+      const auto & llaRefTmp = llas[j];
       Eigen::Vector3d xyz, lla2;
 
-      if (lla2gnomonic(lla, llaRef, xyz)) {
-        gnomonic2lla(xyz, llaRef, lla2);
+      if (lla2gnomonic(llaTmp, llaRefTmp, xyz)) {
+        gnomonic2lla(xyz, llaRefTmp, lla2);
 
-        EXPECT_NEAR(lla[0], lla2[0], 1e-8);
-        EXPECT_NEAR(lla[1], lla2[1], 1e-8);
-        EXPECT_NEAR(lla[2], lla2[2], 1e-8);
+        EXPECT_NEAR(llaTmp[0], lla2[0], 1e-8);
+        EXPECT_NEAR(llaTmp[1], lla2[1], 1e-8);
+        EXPECT_NEAR(llaTmp[2], lla2[2], 1e-8);
       }
     }
   }
@@ -418,8 +418,8 @@ TEST(Geodetic, ecef2lla_pose)
 
     auto [lla_copy, q_nwu_copy] = cbr::geo::ecef2lla(t_ecef, q_ecef);
 
-    if (q_nwu.w() < 0) { q_nwu.coeffs() *= -1; }
-    if (q_nwu_copy.w() < 0) { q_nwu_copy.coeffs() *= -1; }
+    if (q_nwu.w() < 0) {q_nwu.coeffs() *= -1;}
+    if (q_nwu_copy.w() < 0) {q_nwu_copy.coeffs() *= -1;}
 
     ASSERT_TRUE(lla_copy.isApprox(lla));
     ASSERT_TRUE(q_nwu_copy.isApprox(q_nwu));
@@ -440,8 +440,8 @@ TEST(Geodetic, ecef2lla_pose)
 
     auto [lla_copy, q_nwu_copy] = cbr::geo::ecef2lla(t_ecef, q_ecef);
 
-    if (q_nwu.w() < 0) { q_nwu.coeffs() *= -1; }
-    if (q_nwu_copy.w() < 0) { q_nwu_copy.coeffs() *= -1; }
+    if (q_nwu.w() < 0) {q_nwu.coeffs() *= -1;}
+    if (q_nwu_copy.w() < 0) {q_nwu_copy.coeffs() *= -1;}
 
     ASSERT_TRUE(lla_copy.isApprox(lla));
     ASSERT_TRUE(q_nwu_copy.isApprox(q_nwu));
@@ -457,10 +457,10 @@ TEST(Geodetic, ecef2lla_pose)
     auto [lla_copy, q_nwu_copy] = cbr::geo::ecef2lla(t_ecef, q_ecef);
     auto [t_ecef_copy, q_ecef_copy] = cbr::geo::lla2ecef(lla_copy, q_nwu_copy);
 
-    if (q_nwu.w() < 0) { q_nwu.coeffs() *= -1; }
-    if (q_nwu_copy.w() < 0) { q_nwu_copy.coeffs() *= -1; }
-    if (q_ecef.w() < 0) { q_ecef.coeffs() *= -1; }
-    if (q_ecef_copy.w() < 0) { q_ecef_copy.coeffs() *= -1; }
+    if (q_nwu.w() < 0) {q_nwu.coeffs() *= -1;}
+    if (q_nwu_copy.w() < 0) {q_nwu_copy.coeffs() *= -1;}
+    if (q_ecef.w() < 0) {q_ecef.coeffs() *= -1;}
+    if (q_ecef_copy.w() < 0) {q_ecef_copy.coeffs() *= -1;}
 
     ASSERT_TRUE(lla_copy.isApprox(lla, 1e-8));
     ASSERT_TRUE(q_nwu_copy.isApprox(q_nwu));

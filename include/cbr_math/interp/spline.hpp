@@ -139,7 +139,6 @@ public:
     }
   }
 
-
 protected:
   template<typename T1, typename T2>
   static matrix_t generateCoeffs(
@@ -188,8 +187,8 @@ protected:
 
       } else {  // If more than 3 points, piecewise cubic interpolation
         coeffs.resize(4, nj);
-        Eigen::MatrixXd A = Eigen::MatrixXd::Zero(4. * nj, 4. * nj);
-        Eigen::VectorXd b = Eigen::VectorXd::Zero(4. * nj);
+        Eigen::MatrixXd A = Eigen::MatrixXd::Zero(4 * nj, 4 * nj);
+        Eigen::VectorXd b = Eigen::VectorXd::Zero(4 * nj);
 
         // Function continuity
         uint64_t i0 = 0;

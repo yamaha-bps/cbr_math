@@ -70,6 +70,7 @@ constexpr T powFastImpl([[maybe_unused]] T val, std::index_sequence<Is...>)
 {
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wunused-value"
+  #pragma GCC diagnostic ignored "-Wconversion"
   // *INDENT-OFF*
   return ((Is, val) * ... * T{1});
   // *INDENT-ON*

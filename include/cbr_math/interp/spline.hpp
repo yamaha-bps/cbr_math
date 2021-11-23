@@ -97,7 +97,7 @@ public:
       }
 
       std::vector<matrix_t> coefLists;
-      coefLists.reserve(ys.rows());
+      coefLists.reserve(static_cast<std::size_t>(ys.rows()));
 
       for (Eigen::Index i = 0; i < ys.rows(); i++) {
         coefLists.push_back(generateCoeffs(x, ys.row(i)));
@@ -139,7 +139,6 @@ public:
     }
   }
 
-
 protected:
   template<typename T1, typename T2>
   static matrix_t generateCoeffs(
@@ -153,9 +152,9 @@ protected:
 
     matrix_t coeffs;
 
-    const std::size_t nx = x.size();
-    const std::size_t nj = nx - 1;
-    const std::size_t ni = y.rows();
+    const Eigen::Index nx = x.size();
+    const Eigen::Index nj = nx - 1;
+    const Eigen::Index ni = y.rows();
 
     if (ni == 1) {
       if (nx == 2) {  // If only 2 points, linear interpolation
@@ -188,12 +187,12 @@ protected:
 
       } else {  // If more than 3 points, piecewise cubic interpolation
         coeffs.resize(4, nj);
-        Eigen::MatrixXd A = Eigen::MatrixXd::Zero(4. * nj, 4. * nj);
-        Eigen::VectorXd b = Eigen::VectorXd::Zero(4. * nj);
+        Eigen::MatrixXd A = Eigen::MatrixXd::Zero(4 * nj, 4 * nj);
+        Eigen::VectorXd b = Eigen::VectorXd::Zero(4 * nj);
 
         // Function continuity
-        uint64_t i0 = 0;
-        for (uint64_t i = 0; i < nx - 1; i++) {
+        Eigen::Index i0 = 0;
+        for (Eigen::Index i = 0; i < nx - 1; i++) {
           A(2 * i, 4 * i) = powFast<3>(x[i + 1] - x[i]);
           A(2 * i, 4 * i + 1) = powFast<2>(x[i + 1] - x[i]);
           A(2 * i, 4 * i + 2) = (x[i + 1] - x[i]);
@@ -206,7 +205,7 @@ protected:
 
         // First derivative continuity
         i0 += 2 * (nx - 1);
-        for (uint64_t i = 0; i < nx - 2; i++) {
+        for (Eigen::Index i = 0; i < nx - 2; i++) {
           A(i0 + i, 4 * i) = 3. * powFast<2>(x[i + 1] - x[i]);
           A(i0 + i, 4 * i + 1) = 2. * (x[i + 1] - x[i]);
           A(i0 + i, 4 * i + 2) = 1.;
@@ -215,7 +214,7 @@ protected:
 
         // Second derivatives continuity
         i0 += (nx - 2);
-        for (uint64_t i = 0; i < nx - 2; i++) {
+        for (Eigen::Index i = 0; i < nx - 2; i++) {
           A(i0 + i, 4 * i) = 6. * (x[i + 1] - x[i]);
           A(i0 + i, 4 * i + 1) = 2.;
           A(i0 + i, 4 * i + 5) = -2.;
@@ -236,7 +235,7 @@ protected:
 
     } else if (ni == 2) {
       coeffs.resize(4, nj);
-      for (uint64_t i = 0; i < nj; i++) {
+      for (Eigen::Index i = 0; i < nj; i++) {
         Eigen::Matrix4d A = Eigen::Matrix4d::Zero();
         Eigen::Vector4d b = Eigen::Vector4d::Zero();
 
@@ -264,7 +263,7 @@ protected:
 
     } else if (ni == 3) {
       coeffs.resize(6, nj);
-      for (uint64_t i = 0; i < nj; i++) {
+      for (Eigen::Index i = 0; i < nj; i++) {
         Eigen::Matrix<double, 6, 6> A = Eigen::Matrix<double, 6, 6>::Zero();
         Eigen::Matrix<double, 6, 1> b = Eigen::Matrix<double, 6, 1>::Zero();
 

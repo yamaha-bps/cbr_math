@@ -83,7 +83,7 @@ public:
       if (ys.cols() != x.size()) {
         throw std::invalid_argument("The number of columns of ys must be equal to the size of x.");
       }
-      coefLists.reserve(ys.rows());
+      coefLists.reserve(static_cast<std::size_t>(ys.rows()));
 
       for (Eigen::Index i = 0; i < ys.rows(); i++) {
         coefLists.push_back(generateCoeffs(x, ys.row(i)));
@@ -121,10 +121,10 @@ protected:
       throw std::invalid_argument("Each element of ys must have the same size as x.");
     }
 
-    std::size_t nj = x.size() - 1;
+    Eigen::Index nj = x.size() - 1;
     matrix_t coeffs(2, nj);
 
-    for (std::size_t i = 0; i < nj; i++) {
+    for (Eigen::Index i = 0; i < nj; i++) {
       coeffs(1, i) = y[i];
       coeffs(0, i) = (y[i + 1] - y[i]) / (x[i + 1] - x[i]);
     }

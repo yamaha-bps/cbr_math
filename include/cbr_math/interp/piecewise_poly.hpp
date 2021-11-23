@@ -202,7 +202,7 @@ protected:
               throw std::runtime_error("Point outside break points range. Should never happen!");
             }
 
-            if (breakPoints_[idx] >= x) {
+            if (breakPoints_[static_cast<Eigen::Index>(idx)] >= x) {
               if (idx == length_ - 1) {
                 idx--;
               }
@@ -252,7 +252,9 @@ protected:
 
     if (forward) {
       for (; idx <= (length_ - 2); idx++) {
-        if (breakPoints_[idx] <= x && x < breakPoints_[idx + 1]) {
+        if (breakPoints_[static_cast<Eigen::Index>(idx)] <= x &&
+          x < breakPoints_[static_cast<Eigen::Index>(idx + 1)])
+        {
           return true;
         }
       }
@@ -262,7 +264,9 @@ protected:
         return true;
       }
       for (; idx > 0; idx--) {
-        if (breakPoints_[idx] <= x && x < breakPoints_[idx + 1]) {
+        if (breakPoints_[static_cast<Eigen::Index>(idx)] <= x &&
+          x < breakPoints_[static_cast<Eigen::Index>(idx + 1)])
+        {
           return true;
         }
       }
@@ -281,18 +285,22 @@ protected:
     const double x,
     std::size_t & idx) const noexcept
   {
-    if (length_ < 2 || x < breakPoints_[0] || x >= breakPoints_[length_ - 1]) {
+    if (length_ < 2 || x < breakPoints_[0] ||
+      x >= breakPoints_[static_cast<Eigen::Index>(length_ - 1)])
+    {
       return false;
     }
 
     std::size_t low{0}, high{length_ - 1};
 
     while (low < high) {
-      const double frac = (x - breakPoints_[low]) / (breakPoints_[high] - breakPoints_[low]);
-      idx = low + static_cast<std::size_t>(frac * (high - low));
-      if (x < breakPoints_[idx]) {
+      const double frac = (x - breakPoints_[static_cast<Eigen::Index>(low)]) /
+        (breakPoints_[static_cast<Eigen::Index>(high)] -
+        breakPoints_[static_cast<Eigen::Index>(low)]);
+      idx = low + static_cast<std::size_t>(frac * static_cast<double>(high - low));
+      if (x < breakPoints_[static_cast<Eigen::Index>(idx)]) {
         high = idx;
-      } else if (x >= breakPoints_[idx + 1]) {
+      } else if (x >= breakPoints_[static_cast<Eigen::Index>(idx) + 1]) {
         low = idx + 1;
       } else {
         break;  // we have breakPoints_[idx] <= t < breakPoints_[idx+1]
@@ -309,10 +317,17 @@ protected:
     const matrix_t & coefList,
     const std::size_t order) const
   {
-    T val = coefList(order - 1, pieceIdx);
-    const auto & x0 = breakPoints_[pieceIdx];
+    T val =
+      static_cast<T>(coefList(
+        static_cast<Eigen::Index>(order - 1),
+        static_cast<Eigen::Index>(pieceIdx)));
+    const auto & x0 = breakPoints_[static_cast<Eigen::Index>(pieceIdx)];
     for (std::size_t i = 1; i < order; i++) {
-      val += coefList(order - 1 - i, pieceIdx) * powFast<T, std::size_t>(x - x0, i);
+      val +=
+        static_cast<T>(coefList(
+          static_cast<Eigen::Index>(order - 1 - i),
+          static_cast<Eigen::Index>(pieceIdx))) * powFast<T, std::size_t>(
+        x - static_cast<T>(x0), i);
     }
     return val;
   }
@@ -332,11 +347,14 @@ protected:
       T val{0.};
 
       if (n < order) {
-        const auto & x0 = breakPoints_[pieceIdx];
+        const auto & x0 = breakPoints_[static_cast<Eigen::Index>(pieceIdx)];
         for (std::size_t i = n; i < order; i++) {
-          val += factorial(i, i - n + 1) * coefList(order - 1 - i, pieceIdx) *
+          val +=
+            static_cast<T>(factorial(i, i - n + 1)) * static_cast<T>(coefList(
+              static_cast<Eigen::Index>(order - 1 - i),
+              static_cast<Eigen::Index>(pieceIdx))) *
             powFast<T, std::size_t>(
-            x - x0,
+            x - static_cast<T>(x0),
             i - n);
         }
       }
@@ -358,17 +376,17 @@ protected:
       switch (extrap_) {
         case EXTRAP::CLAMP: {
             if (n == 0) {
-              return ex.valEnd;
+              return static_cast<T>(ex.valEnd);
             }
             return T{0.};
           }
 
         case EXTRAP::LINEAR: {
             if (n == 0) {
-              return ex.valEnd + ex.derEnd * (x - xEnd_);
+              return static_cast<T>(ex.valEnd + ex.derEnd * (x - xEnd_));
             }
             if (n == 1) {
-              return ex.derEnd;
+              return static_cast<T>(ex.derEnd);
             }
             return T{0.};
           }
@@ -388,16 +406,16 @@ protected:
       switch (extrap_) {
         case EXTRAP::CLAMP: {
             if (n == 0) {
-              return ex.val0;
+              return static_cast<T>(ex.val0);
             }
             return T{0.};
           }
         case EXTRAP::LINEAR: {
             if (n == 0) {
-              return ex.val0 + ex.der0 * (x - x0_);
+              return static_cast<T>(ex.val0 + ex.der0 * (x - x0_));
             }
             if (n == 1) {
-              return ex.der0;
+              return static_cast<T>(ex.der0);
             }
             return T{0.};
           }
@@ -491,9 +509,9 @@ public:
     extremities_.val0 = evalPoly<double>(breakPoints_[0], 0, coefList_, order_);
     extremities_.der0 = evalPolyDer<double>(breakPoints_[0], 0, 1, coefList_, order_);
     extremities_.valEnd = evalPoly<double>(
-      breakPoints_[length_ - 1], length_ - 2, coefList_, order_);
+      breakPoints_[static_cast<Eigen::Index>(length_ - 1)], length_ - 2, coefList_, order_);
     extremities_.derEnd = evalPolyDer<double>(
-      breakPoints_[length_ - 1], length_ - 2, 1, coefList_,
+      breakPoints_[static_cast<Eigen::Index>(length_ - 1)], length_ - 2, 1, coefList_,
       order_);
   }
 
@@ -677,8 +695,12 @@ public:
       extremities_.emplace_back(
         evalPoly<double>(breakPoints_[0], 0, coefList, orders_.back()),
         evalPolyDer<double>(breakPoints_[0], 0, 1, coefList, orders_.back()),
-        evalPoly<double>(breakPoints_[length_ - 1], length_ - 2, coefList, orders_.back()),
-        evalPolyDer<double>(breakPoints_[length_ - 1], length_ - 2, 1, coefList, orders_.back())
+        evalPoly<double>(
+          breakPoints_[static_cast<Eigen::Index>(length_ - 1)], length_ - 2,
+          coefList, orders_.back()),
+        evalPolyDer<double>(
+          breakPoints_[static_cast<Eigen::Index>(length_ - 1)], length_ - 2, 1,
+          coefList, orders_.back())
       );
     }
   }
@@ -691,11 +713,13 @@ public:
     const auto [pieceIdx, flag] = findPosition(static_cast<double>(x));
     if (flag == 0) {
       for (std::size_t i = 0; i < N_; i++) {
-        out[i] = evalPoly<T>(x, pieceIdx, coefLists_[i], orders_[i]);
+        out[static_cast<Eigen::Index>(i)] = evalPoly<T>(x, pieceIdx, coefLists_[i], orders_[i]);
       }
     } else {
       for (std::size_t i = 0; i < N_; i++) {
-        out[i] = extrapPoly<T>(flag, x, 0, coefLists_[i], orders_[i], extremities_[i]);
+        out[static_cast<Eigen::Index>(i)] = extrapPoly<T>(
+          flag, x, 0, coefLists_[i], orders_[i],
+          extremities_[i]);
       }
     }
 
@@ -747,11 +771,14 @@ public:
     const auto [pieceIdx, flag] = findPosition(static_cast<double>(x));
     if (flag == 0) {
       for (std::size_t i = 0; i < N_; i++) {
-        out[i] = evalPolyDer<T>(x, pieceIdx, n, coefLists_[i], orders_[i]);
+        out[static_cast<Eigen::Index>(i)] =
+          evalPolyDer<T>(x, pieceIdx, n, coefLists_[i], orders_[i]);
       }
     } else {
       for (std::size_t i = 0; i < N_; i++) {
-        out[i] = extrapPoly<T>(flag, x, n, coefLists_[i], orders_[i], extremities_[i]);
+        out[static_cast<Eigen::Index>(i)] = extrapPoly<T>(
+          flag, x, n, coefLists_[i], orders_[i],
+          extremities_[i]);
       }
     }
 
@@ -779,7 +806,7 @@ public:
     static_assert(N > 0, "Input must be of size > 0.");
 
     std::array<col_t<T>, N> out;
-    for (size_t i = 0; i < N; i++) {
+    for (std::size_t i = 0; i < N; i++) {
       out[i] = der<T>(xs[i], n);
     }
     return out;
